@@ -1,0 +1,24 @@
+<% ApplicationWidget.widgets.each do |widget| %>
+    <ul>
+      <li>
+        <b><%= widget[:name] %></b>
+        <br><span class="help-block"><%= widget[:description] %></span>
+        <ul>
+          <% widget[:actions].each do |action| %>
+              <% widget_code = "#{widget[:code]}_#{action[:name]}" %>
+              <li>
+                <div class="checkbox">
+                  <%= label_tag widget_code do %>
+                      <%= check_box_tag 'widgets[]', "#{widget[:code]}|#{action[:name]}", @widgets_code.include?(widget_code), {id: widget_code} %>
+                      <b><%= action[:name].to_s.humanize %></b>
+                      <% if action[:description].present? %>
+                          <br><span class="help-block"><%= action[:description] %></span>
+                      <% end %>
+                  <% end %>
+                </div>
+              </li>
+          <% end %>
+        </ul>
+      </li>
+    </ul>
+<% end %>

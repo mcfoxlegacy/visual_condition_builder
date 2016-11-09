@@ -1,0 +1,17 @@
+PATH
+  remote: .
+  specs:
+    visual_condition_builder (0.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  visual_condition_builder!
+
+BUNDLED WITH
+   1.13.1

@@ -1,0 +1,1 @@
+Rails.application.config.assets.precompile += %w( visual_condition_builder.js visual_condition_builder.css  )

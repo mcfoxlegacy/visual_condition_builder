@@ -1,0 +1,12 @@
+class <%= @widget_name %>Widget < ApplicationWidget
+
+  name! "<%= @widget_name %>"
+  description! "O Widget <%= @widget_name %> tem como função..."
+  #refresh_interval 60000 #60 segundos para refresh automático
+
+  description! :exemplo, 'Essa ação é um exemplo'
+  def exemplo
+    @data = Date.today
+  end
+
+end
