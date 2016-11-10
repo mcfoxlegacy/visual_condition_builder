@@ -139,6 +139,8 @@ jQuery.fn.conditionBuilder = function (options) {
             if ($(parameters.input).length > 0) {
                 parameters.values = JSON.parse($(parameters.input).val());
             }
+        } else {
+            parameters.values = values;
         }
         build_rows();
     }; //END load_values
@@ -542,25 +544,6 @@ jQuery.fn.conditionBuilder = function (options) {
         return operators;
     }; //END normalize_operators
 
-    // NORMALIZED ON RAILS
-    // var normalize_dictionary = function(dictionary) {
-    //     $.each(dictionary, function(i, data) {
-    //         if (is_blank(data.type)) {
-    //             dictionary[i]['type'] = 'STRING';
-    //         }
-    //         if (is_blank(data.label)) {
-    //             dictionary[i]['label'] = '';
-    //         }
-    //         if (is_blank(data.group)) {
-    //             dictionary[i]['group'] = '';
-    //         }
-    //         if (is_blank(data.operators)) {
-    //             dictionary[i]['operators'] = [{operator: '='}]
-    //         }
-    //     });
-    //     return dictionary;
-    // }; //EMD normalize_dictionary
-
     var is_blank = function (value) {
         return (value === undefined || value === null || value === [] || value === '')
     }; //END is_blank
@@ -678,10 +661,8 @@ jQuery.fn.conditionBuilder = function (options) {
     if (typeof parameters.dictionary == 'string') {
         parameters.dictionary = getJson(parameters.dictionary);
     }
-    //parameters.dictionary = normalize_dictionary(parameters.dictionary);
 
     if (!is_blank(parameters.input)) {
-        console.log('a');
         $conditionBuilder.load_values_from_input(parameters.input);
         $(document).on('change', parameters.input, function(ev){
             $conditionBuilder.load_values_from_input(parameters.input);
