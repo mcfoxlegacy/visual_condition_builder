@@ -155,6 +155,23 @@ jQuery.fn.conditionBuilder = function (options) {
         return index == undefined ? parameters.dictionary : parameters.dictionary[index];
     }; //END getDates
 
+    var getLabel = function(obj) {
+        if (!is_blank(obj.label)) {
+            return String(obj.label);
+        } else {
+            return '';
+        }
+    };
+
+    var groupLabel = function(obj) {
+        if (obj.group!==undefined) {
+            var label = (typeof obj.group === 'object') ? obj.group[Object.keys(obj.group)[0]] : obj.group;
+            return String(label);
+        } else {
+            return '';
+        }
+    }; //END groupLabel
+
     var getFrameConditions = function (element) {
         if (element == undefined) {
             return $conditionBuilder.find('.conditions:first');
@@ -266,7 +283,7 @@ jQuery.fn.conditionBuilder = function (options) {
         operators = normalize_operators(operators);
         if (operators != undefined && operators.length > 1) {
             $.each(operators, function (op_i, op_el) {
-                var op_option = $('<option data-index="' + op_i + '" data-no-value="' + op_el.no_value + '" data-multiple="' + op_el.multiple + '" value="' + op_el.operator + '">' + op_el.label + '</option>');
+                var op_option = $('<option data-index="' + op_i + '" data-no-value="' + op_el.no_value + '" data-multiple="' + op_el.multiple + '" value="' + op_el.operator + '">' + getLabel(op_el) + '</option>');
                 $operators.append(op_option);
             });
             $operators.removeClass('hide');
@@ -311,14 +328,12 @@ jQuery.fn.conditionBuilder = function (options) {
         var datas = getDates();
         datas.sort(order_by_group_and_label);
         $.each(datas, function (i, data) {
-            if (is_blank(data.label)) {
-                data.label = data.field
-            }
+            var label = getLabel(data);
+            var group = groupLabel(data); 
             if (is_blank(data.type)) {
                 data.type = 'string';
             }
-            var label = data.label;
-            if (data.group != undefined && data.group != '') {label = data.group + ' - ' + label; }
+            if (!is_blank(group)) {label = group + ' - ' + label;}
             $elFields.append('<option data-index="' + i + '" data-type="' + data.type + '" value="' + data.field + '">' + label + '</option>');
         });
         if (parameters.allowBlank == true) {
@@ -365,7 +380,10 @@ jQuery.fn.conditionBuilder = function (options) {
                 $.each(values, function (val_i, val_el) {
                     if (typeof val_el == 'object') {
                         var _id = val_el.id;
-                        var _label = val_el.label != undefined && !is_blank(val_el.label) ? val_el.label : val_el.id;
+                        var _label = getLabel(val_el);
+                        if (is_blank(_label)) {
+                            _label = _id;
+                        }
                     } else {
                         var _id = val_el;
                         var _label = _id;
@@ -487,40 +505,42 @@ jQuery.fn.conditionBuilder = function (options) {
     var normalize_operators = function (operators) {
         if (operators != undefined && typeof operators == 'object' && operators.length > 0) {
             $.each(operators, function (i, row) {
-                if (is_blank(row.label)) {
-                    operators[i].label = row.operator
+                var label = getLabel(row);
+                if (is_blank(label)) {
+                    operators[i].label = row.operator;
                 }
                 if (is_blank(row.multiple)) {
-                    operators[i].multiple = 'false'
+                    operators[i].multiple = 'false';
                 }
                 if (is_blank(row.no_value)) {
-                    operators[i].no_value = 'false'
+                    operators[i].no_value = 'false';
                 }
             });
         }
         return operators;
     }; //END normalize_operators
 
-    var normalize_dictionary = function(dictionary) {
-        $.each(dictionary, function(i, data) {
-            if (is_blank(data.type)) {
-                dictionary[i]['type'] = 'STRING';
-            }
-            if (is_blank(data.label)) {
-                dictionary[i]['label'] = '';
-            }
-            if (is_blank(data.group)) {
-                dictionary[i]['group'] = '';
-            }
-            if (is_blank(data.operators)) {
-                dictionary[i]['operators'] = [{operator: '='}]
-            }
-        });
-        return dictionary;
-    };
+    // NORMALIZED ON RAILS
+    // var normalize_dictionary = function(dictionary) {
+    //     $.each(dictionary, function(i, data) {
+    //         if (is_blank(data.type)) {
+    //             dictionary[i]['type'] = 'STRING';
+    //         }
+    //         if (is_blank(data.label)) {
+    //             dictionary[i]['label'] = '';
+    //         }
+    //         if (is_blank(data.group)) {
+    //             dictionary[i]['group'] = '';
+    //         }
+    //         if (is_blank(data.operators)) {
+    //             dictionary[i]['operators'] = [{operator: '='}]
+    //         }
+    //     });
+    //     return dictionary;
+    // }; //EMD normalize_dictionary
 
     var is_blank = function (value) {
-        return (value == undefined || value == null || value == [] || value == '')
+        return (value === undefined || value === null || value === [] || value === '')
     }; //END is_blank
 
     var flatten = function (arrays) {
@@ -537,10 +557,10 @@ jQuery.fn.conditionBuilder = function (options) {
 
     var order_by_group_and_label = function (a, b) {
         //removeDiacritics > diacritics.js
-        var labelA = removeDiacritics(a.label.toUpperCase());
-        var labelB = removeDiacritics(b.label.toUpperCase());
-        var groupA = removeDiacritics(a.group.toUpperCase());
-        var groupB = removeDiacritics(b.group.toUpperCase());
+        var labelA = removeDiacritics(getLabel(a).toUpperCase());
+        var labelB = removeDiacritics(getLabel(b).toUpperCase());
+        var groupA = removeDiacritics(groupLabel(a).toUpperCase());
+        var groupB = removeDiacritics(groupLabel(b).toUpperCase());
         if (groupA == groupB) {
             return (labelA < labelB) ? -1 : (labelA > labelB) ? 1 : 0;
         } else {
@@ -592,7 +612,7 @@ jQuery.fn.conditionBuilder = function (options) {
                         return {
                             results: $.map(data, function (item) {
                                 return {
-                                    text: item.label,
+                                    text: getLabel(item),
                                     id: item.id
                                 }
                             })
@@ -636,7 +656,7 @@ jQuery.fn.conditionBuilder = function (options) {
     if (typeof parameters.dictionary == 'string') {
         parameters.dictionary = getJson(parameters.dictionary);
     }
-    parameters.dictionary = normalize_dictionary(parameters.dictionary);
+    //parameters.dictionary = normalize_dictionary(parameters.dictionary);
 
     $conditionBuilder.load_values(parameters.values);
 
