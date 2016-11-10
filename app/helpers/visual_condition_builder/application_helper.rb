@@ -1,19 +1,33 @@
 module VisualConditionBuilder
   module ApplicationHelper
 
-    def add_widget(widget_name, widget_action)
-      widget = VisualConditionBuilder::Widget.new(widget_name, self.request)
-      content_tag(:div, '', id: "widget_#{widget_name}_#{widget_action}", class: 'widget', data: {tick: widget.param(:refresh_interval), url: visual_condition_builder_load_path(widget_name: widget_name, widget_action: widget_action)})
-    end
+    def visual_conditions(dictionary, *args)
+      if dictionary.is_a?(Hash)
+        dictionary_name = "#{dictionary.keys.first}_#{dictionary.values.first}"
+      else
+        dictionary_name = "#{dictionary}_default"
+      end
 
-    def widget_path(args=nil)
-      my_params = {widget_name: params[:widget_name], widget_action: params[:widget_action]}
-      my_params.merge!(args) if args.present?
-      visual_condition_builder_load_path(my_params)
-    end
+      base_name = "#{dictionary_name}_condition".camelize(:lower)
+      object_name = "#{base_name}Builder"
+      container_name = "#{dictionary_name}_condition_container"
 
-    def user_can_widget?(widget_name, widget_action)
-      VisualConditionBuilder::User.where(user_id: current_user.id, widget: widget_name, action: widget_action).count > 0
+      hArgs = (args ||= []).reduce(Hash.new, :merge)
+      hArgs[:jsFnCallback] = "#{base_name}Callback" unless hArgs[:jsFnCallback].present?
+
+      builder_options = {
+          dictionary: ObrigacaoDictionary.dictionary
+      }.deep_merge(hArgs)
+
+      capture do
+        concat(content_tag(:div, nil, id: container_name))
+        concat(javascript_tag(<<txtjs
+            $(document).ready(function () {
+              window['#{object_name}'] = $('##{container_name}').conditionBuilder(#{builder_options.to_json});
+            });
+txtjs
+        ))
+      end
     end
 
   end

@@ -9,6 +9,7 @@ jQuery.fn.conditionBuilder = function (options) {
         },
         dictionary: [],
         values: [],
+        input: '',
         debug: false,
         numericConfig: {
             aSep: '',
@@ -23,7 +24,8 @@ jQuery.fn.conditionBuilder = function (options) {
             dropdownAutoWidth: 'true',
             tags: false
         },
-        result: function () {}
+        jsFnCallback: '',
+        result: function(){}
     };
 
     var parameters = $.extend(true, defaults, options);
@@ -133,9 +135,21 @@ jQuery.fn.conditionBuilder = function (options) {
         $frameConditions = getFrameConditions();
         if (typeof values == 'string') {
             parameters.values = getJson(values);
+        } else if (is_blank(values) && !is_blank(parameters.input)) {
+            if ($(parameters.input).length > 0) {
+                parameters.values = JSON.parse($(parameters.input).val());
+            }
         }
         build_rows();
     }; //END load_values
+
+    $conditionBuilder.load_values_from_input = function (element_input) {
+        var $elInput = $(element_input);
+        if ($elInput.length > 0) {
+            parameters.values = JSON.parse($elInput.val());
+        }
+        $conditionBuilder.load_values(parameters.values);
+    }; //END load_values_from_input
 
     $conditionBuilder.getResult = function () {
         var data = [];
@@ -146,7 +160,15 @@ jQuery.fn.conditionBuilder = function (options) {
                 data.push([field, operator, getValue(groupConditions)])
             }
         });
-        parameters.result(data);
+        if (!is_blank(parameters.jsFnCallback) && typeof window[parameters.jsFnCallback] === 'function') {
+            window[parameters.jsFnCallback](data); //CB
+        }
+        if (typeof parameters.result === 'function') {
+            parameters.result(data); //CB
+        }
+        if (!is_blank(parameters.input)) {
+            $(parameters.input).val(JSON.stringify(data));
+        }
         return data;
     }; //END getResult;
 
@@ -354,7 +376,7 @@ jQuery.fn.conditionBuilder = function (options) {
         } else {
             $conditionBuilder.add_condition();
         }
-    }
+    };
 
     var build_values = function (op_el, values) {
         var $groupConditions = $(op_el).closest('.group-conditions');
@@ -658,7 +680,14 @@ jQuery.fn.conditionBuilder = function (options) {
     }
     //parameters.dictionary = normalize_dictionary(parameters.dictionary);
 
-    $conditionBuilder.load_values(parameters.values);
-
+    if (!is_blank(parameters.input)) {
+        console.log('a');
+        $conditionBuilder.load_values_from_input(parameters.input);
+        $(document).on('change', parameters.input, function(ev){
+            $conditionBuilder.load_values_from_input(parameters.input);
+        });
+    } else {
+        $conditionBuilder.load_values(parameters.values);
+    }
     return $conditionBuilder;
 };
