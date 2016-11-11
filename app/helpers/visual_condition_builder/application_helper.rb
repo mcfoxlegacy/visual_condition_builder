@@ -15,6 +15,8 @@ module VisualConditionBuilder
       hArgs = (args ||= []).reduce(Hash.new, :merge)
       hArgs[:jsFnCallback] = "#{base_name}Callback" unless hArgs[:jsFnCallback].present?
 
+      hArgs = normalize_placeholder_label(hArgs)
+
       builder_options = {
           dictionary: ObrigacaoDictionary.dictionary
       }.deep_merge(hArgs)
@@ -28,6 +30,18 @@ module VisualConditionBuilder
 txtjs
         ))
       end
+    end
+
+    private
+    def normalize_placeholder_label(args)
+      args[:placeholder] ||= {}
+      [:fields, :operators, :values].each do |attr|
+        unless args[:placeholder][attr].present?
+          label = I18n.t(attr, default: [''], scope: [:condition_builder, :placeholder])
+          args[:placeholder][attr] = label if label.present?
+        end
+      end
+      args
     end
 
   end

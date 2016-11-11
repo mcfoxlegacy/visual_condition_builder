@@ -1,7 +1,6 @@
 jQuery.fn.conditionBuilder = function (options) {
 
     var defaults = {
-        allowBlank: true,
         placeholder: {
             fields: 'Select a item...',
             operators: 'Select a operator...',
@@ -360,11 +359,6 @@ jQuery.fn.conditionBuilder = function (options) {
             if (!is_blank(group)) {label = group + ' - ' + label;}
             $elFields.append('<option data-index="' + i + '" data-type="' + data.type + '" value="' + data.field + '">' + label + '</option>');
         });
-        if (parameters.allowBlank == true) {
-            $elFields.prepend('<option value=""></option>').val('');
-        } else {
-            elFields.trigger('change');
-        }
         build_select2_element(elFields);
     }; //END LOAD_FIELDS
 
@@ -389,7 +383,6 @@ jQuery.fn.conditionBuilder = function (options) {
         multiple = (multiple == 'true' ? 'true' : 'false');
         $values.html('').removeAttr('data-ajax-values').addClass('hide');
         $fixedValue.removeAttr('data-ajax-values').addClass('hide');
-
 
         if (typeof values === 'string') {
             $values.attr('data-ajax-values', values);
@@ -628,6 +621,8 @@ jQuery.fn.conditionBuilder = function (options) {
             });
         }
 
+        var totalItems = $element.find('option').length;
+
         if ($element.hasClass('fields')) {
             $.extend(select2Config, {placeholder: parameters.placeholder.fields});
         }
@@ -639,18 +634,13 @@ jQuery.fn.conditionBuilder = function (options) {
         }
 
         if (tags == true) {
-            $.extend(select2Config, {
-                tags: true,
-                tokenSeparators: [',',';',' ']
-            });
-        } else {
-            if (parameters.allowBlank == true) {
-                $.extend(select2Config, {allowClear: true});
-                $element.find('option[value=""]:visible').hide();
-            }
+            $.extend(select2Config, {tags: true, tokenSeparators: [',',';',' ']});
         }
+
         $.fn.select2.defaults.set("theme",(select2Config.theme || 'bootstrap'));
-        $element.select2(select2Config);
+        var select2El = $element.select2(select2Config);
+        var select2DefaultValue = (totalItems == 1 ? $element.find('option:first').val() : null);
+        select2El.val(select2DefaultValue).trigger("change"); //FORCE RESET DO SET PLACEHOLDER
     }
 
     //~~~ INIT
