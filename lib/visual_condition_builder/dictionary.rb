@@ -47,55 +47,65 @@ module VisualConditionBuilder
                       else
                         []
                     end
-        operators.map{|o| operators_list[o]}.deep_merge
-      rescue
-        [{operator: '='}]
+        operators.map{|o| operators_list(o)}
+      # rescue
+      #   [{operator: '='}]
       end
 
-      def operators_list
-        {
-            eq: {operator: 'eq', multiple: false},
-            not_eq: {operator: 'eq', multiple: false},
+      def operators_list(op=nil)
+        operators = {
+            eq: {multiple: false},
+            not_eq: {multiple: false},
 
-            matches: {operator: 'matches', multiple: false},
-            does_not_match: {operator: 'matches', multiple: false},
+            matches: {multiple: false},
+            does_not_match: {multiple: false},
 
-            lt: {operator: 'lt', multiple: false},
-            gt: {operator: 'gt', multiple: false},
+            lt: {multiple: false},
+            gt: {multiple: false},
 
-            lteq: {operator: 'lteq', multiple: false},
-            gteq: {operator: 'gteq', multiple: false},
+            lteq: {multiple: false},
+            gteq: {multiple: false},
 
-            in: {operator: 'in', multiple: true},
-            not_in: {operator: 'not_in', multiple: true},
+            in: {multiple: true},
+            not_in: {multiple: true},
 
-            cont: {operator: 'cont', multiple: false},
-            not_cont: {operator: 'not_cont', multiple: false},
+            cont: {multiple: false},
+            not_cont: {multiple: false},
 
-            cont_any: {operator: 'cont_any', multiple: true},
-            not_cont_any: {operator: 'not_cont_any', multiple: true},
+            cont_any: {multiple: true},
+            not_cont_any: {multiple: true},
 
-            cont_all: {operator: 'cont_all', multiple: true},
-            not_cont_all: {operator: 'not_cont_all', multiple: true},
+            cont_all: {multiple: true},
+            not_cont_all: {multiple: true},
 
-            start: {operator: 'start', multiple: false},
-            not_start: {operator: 'not_start', multiple: false},
+            start: {multiple: false},
+            not_start: {multiple: false},
 
-            end: {operator: 'end', multiple: false},
-            not_end: {operator: 'not_end', multiple: false},
+            end: {multiple: false},
+            not_end: {multiple: false},
 
-            true: {operator: 'true', no_value: true, multiple: false},
-            not_true: {operator: 'not_true', no_value: true, multiple: false},
+            true: {no_value: true, multiple: false},
+            not_true: {no_value: true, multiple: false},
 
-            false: {operator: 'false', no_value: true, multiple: false},
-            not_false: {operator: 'not_false', no_value: true, multiple: false},
+            false: {no_value: true, multiple: false},
+            not_false: {no_value: true, multiple: false},
 
-            present: {operator: 'present', no_value: true, multiple: false},
-            blank: {operator: 'blank', no_value: true, multiple: false},
+            present: {no_value: true, multiple: false},
+            blank: {no_value: true, multiple: false},
 
-            null: {operator: 'null', no_value: true, multiple: false},
-            not_null: {operator: 'not_null', no_value: true, multiple: false},
+            null: {no_value: true, multiple: false},
+            not_null: {no_value: true, multiple: false},
         }
+        operators.each do |op, attrs|
+          attrs[:operator] = op.to_s
+          attrs[:description] = operator_translate(op)
+          operators[op] = attrs
+        end
+        (op.nil? ? operators : operators[op])
+      end
+
+      def operator_translate(op)
+        I18n.t(op, default: op, scope: [:condition_builder, :operators])
       end
 
       def dictionary_name
