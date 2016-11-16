@@ -37,7 +37,7 @@ txtjs
             concat(I18n.t(:dropdown, default: ['Fields'], scope: [:condition_builder]))
             concat(content_tag(:span, nil, class:'caret'))
           end)
-          concat(content_tag(:ul, class: 'dropdown-menu') do
+          concat(content_tag(:ul, class: 'dropdown-menu add-condition-menu') do
             ObrigacaoDictionary.fields(get_dictionary_context(dictionary)).each do |attrs|
               concat(content_tag(:li, link_to(attrs[:label], '#', class: 'add-condition-field', data: {field: attrs[:field]})))
             end

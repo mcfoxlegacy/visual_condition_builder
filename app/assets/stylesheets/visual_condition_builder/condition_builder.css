@@ -17,6 +17,12 @@
     vertical-align: middle;
 }
 
+.add-condition-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}
+
 .condition-builder .remove-condition {
     margin-left: 5px;
     font-size: 16px;
@@ -73,31 +79,4 @@
     box-shadow:
             0 0.25em 0 0 black,
             0 0.5em 0 0 black;
-}
-
-.condition-builder .delete {
-    position: absolute;
-    right: 32px;
-    top: 32px;
-    width: 32px;
-    height: 32px;
-    opacity: 0.3;
-}
-.condition-builder .delete:hover {
-    opacity: 1;
-}
-.condition-builder .delete:before,
-.condition-builder .delete:after {
-    position: absolute;
-    left: 15px;
-    content: ' ';
-    height: 33px;
-    width: 2px;
-    background-color: #333;
-}
-.condition-builder .delete:before {
-    transform: rotate(45deg);
-}
-.close:after {
-    transform: rotate(-45deg);
 }
