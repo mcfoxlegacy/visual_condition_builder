@@ -39,11 +39,10 @@
             if (typeof fieldObj !== 'object') {
                 return;
             }
-            var $frameConditions = getFrameConditions($element);
 
             //BLOCK ELEMENTS HTML
             var block = $('<div class="group-conditions clearfix"></div>');
-            block.append('<span class="box-shadow-menu"></span>');
+            block.append('<span class="conditions-move"></span>');
             block.append('<input type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
             block.append('<span class="field_name label label-info">' + fieldObj.label + ' <a href="" class="remove-condition">&#10006;</a></span>');
             block.append('<select class="operators hide form-control"></select>');
@@ -61,8 +60,8 @@
             block.find('.remove-condition').on('click', event_remove_condition);
             $elOperators.on('change', event_load_values);
 
-            $frameConditions.append(block);
-            $frameConditions.trigger('change');
+            $element.append(block);
+            $element.trigger('change');
 
             //LOAD OPERATORS
             plugin.load_operators($elField);
@@ -73,8 +72,7 @@
 
         plugin.clear_rows = function () {
             if (confirm('Essa ação removerá todos os itens. Deseja continuar?') == true) {
-                var $frameConditions = getFrameConditions();
-                $frameConditions.find('.group-conditions').remove();
+                $element.find('.group-conditions').remove();
             }
         };
 
@@ -141,7 +139,6 @@
         }; //END fill_condition
 
         plugin.load_values = function (values) {
-            $frameConditions = getFrameConditions();
             if (typeof values == 'string') {
                 plugin.parameters.values = getJson(values);
             } else if (is_blank(values) && !is_blank(plugin.parameters.input)) {
@@ -210,16 +207,6 @@
                 return '';
             }
         }; //END groupLabel
-
-        var getFrameConditions = function (el) {
-            if (el == undefined) {
-                return $element.find('.conditions:first');
-            } else if ($(el).hasClass('conditions')) {
-                return $(el);
-            } else {
-                return $(el).find('.conditions:first');
-            }
-        }; //END getFrameConditions
 
         var getFieldElement = function (groupConditions) {
             return $(groupConditions).find('.field:input');
@@ -595,6 +582,14 @@
             } else {
                 plugin.load_values(plugin.parameters.values);
             }
+
+            Sortable.create(element, {
+                handle: '.conditions-move',
+                animation: 150,
+                onSort: function (evt){
+                    plugin.getResult();
+                }
+            });
         };
 
         plugin.init();

@@ -59,11 +59,11 @@
 
 
 /* */
-.condition-builder .box-shadow-menu {
+.condition-builder .conditions-move {
     position: relative;
     padding-left: 1.25em;
 }
-.condition-builder .box-shadow-menu:before {
+.condition-builder .conditions-move:before {
     content: "";
     position: absolute;
     left: 0;
