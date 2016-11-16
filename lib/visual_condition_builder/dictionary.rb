@@ -10,6 +10,10 @@ module VisualConditionBuilder
         self.dictionaries[name]
       end
 
+      def fields(dictionary_name=:default)
+        self.dictionaries[dictionary_name].map{|d| d.slice(:field, :label, :type)}
+      end
+
       def param(attr, *args)
         #DEFAULT VALUES
         args = array_hashes_to_hash(args)
@@ -55,7 +59,7 @@ module VisualConditionBuilder
       def operators_list(op=nil)
         operators = {
             eq: {multiple: false},
-            not_eq: {multiple: false},
+            not_eq: {multiple: true}, #DEBUG
 
             matches: {multiple: false},
             does_not_match: {multiple: false},
@@ -96,12 +100,17 @@ module VisualConditionBuilder
             null: {no_value: true, multiple: false},
             not_null: {no_value: true, multiple: false},
         }
-        operators.each do |op, attrs|
+        if op.present?
+          attrs = operators[op]
           attrs[:operator] = op.to_s
-          attrs[:description] = operator_translate(op)
-          operators[op] = attrs
+          attrs[:label] = operator_translate(op)
+          attrs
+        else
+          operators.each do |op, attrs|
+            operators[op][:operator] = op.to_s
+            operators[op][:label] = operator_translate(op)
+          end
         end
-        (op.nil? ? operators : operators[op])
       end
 
       def operator_translate(op)

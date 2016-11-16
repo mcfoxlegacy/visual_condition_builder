@@ -17,28 +17,25 @@
     vertical-align: middle;
 }
 
-.condition-builder .clear-rows,
-.condition-builder .add-condition,
 .condition-builder .remove-condition {
-    color: #333 !important;
-    text-decoration: none !important;
-    padding: 3px 5px;
-    font-size: 16px;
-}
-
-.condition-builder .add-condition,
-.condition-builder .remove-condition {
-    /*float: right;*/
-    border-radius: 50%;
     margin-left: 5px;
-    width: 28px;
-    height: 28px;
+    font-size: 16px;
+    vertical-align: middle;
+}
+.condition-builder .remove-condition:hover {
+    text-decoration: none;
 }
 
 .condition-builder .clear-rows {
     clear: both;
     display: block;
     width: 150px;
+}
+
+.condition-builder .field_name {
+    font-size: 14px;
+    margin-right: 5px;
+    padding: 7px 7px 8px 7px;
 }
 
 .condition-builder .operators,
@@ -58,4 +55,52 @@
 .condition-builder .values,
 .condition-builder .fixed_value {
     /*width: 300px;*/
+}
+
+
+/* */
+.condition-builder .box-shadow-menu {
+    position: relative;
+    padding-left: 1.25em;
+}
+.condition-builder .box-shadow-menu:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.25em;
+    width: 1em;
+    height: 0.15em;
+    background: black;
+    box-shadow:
+            0 0.25em 0 0 black,
+            0 0.5em 0 0 black;
+}
+
+
+/* */
+.condition-builder .delete {
+    position: absolute;
+    right: 32px;
+    top: 32px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.3;
+}
+.condition-builder .delete:hover {
+    opacity: 1;
+}
+.condition-builder .delete:before,
+.condition-builder .delete:after {
+    position: absolute;
+    left: 15px;
+    content: ' ';
+    height: 33px;
+    width: 2px;
+    background-color: #333;
+}
+.condition-builder .delete:before {
+    transform: rotate(45deg);
+}
+.close:after {
+    transform: rotate(-45deg);
 }
