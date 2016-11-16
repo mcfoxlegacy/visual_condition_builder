@@ -167,8 +167,9 @@
             $element.find('.group-conditions').each(function (i, groupConditions) {
                 var field_name = getFieldValue(groupConditions);
                 var operator = getOperator(groupConditions);
-                if (field_name != undefined && field_name != '' && operator != undefined && operator != '') {
-                    data.push([field_name, operator, getValue(groupConditions)])
+                var value = getValue(groupConditions);
+                if (!is_blank(field_name) && !is_blank(operator) && !is_blank(value)) {
+                    data.push([field_name, operator, value]);
                 }
             });
             if (typeof plugin.result === 'function') {
