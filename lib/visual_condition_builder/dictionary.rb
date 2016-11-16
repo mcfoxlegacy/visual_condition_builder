@@ -74,7 +74,7 @@ module VisualConditionBuilder
       def operators_list(op=nil)
         operators = {
             eq: {multiple: false},
-            not_eq: {multiple: true}, #DEBUG
+            not_eq: {multiple: false},
 
             matches: {multiple: false},
             does_not_match: {multiple: false},
