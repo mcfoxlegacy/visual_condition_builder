@@ -17,6 +17,10 @@
     vertical-align: middle;
 }
 
+.add-condition {
+    display: inline-block;
+}
+
 .add-condition-menu {
     height: auto;
     max-height: 200px;

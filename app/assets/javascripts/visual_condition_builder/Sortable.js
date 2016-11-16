@@ -2,6 +2,7 @@
  * Sortable
  * @author	RubaXa   <trash@rubaxa.org>
  * @license MIT
+ * https://github.com/RubaXa/Sortable
  */
 
 (function sortableModule(factory) {

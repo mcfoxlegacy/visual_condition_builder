@@ -43,8 +43,12 @@
             //BLOCK ELEMENTS HTML
             var block = $('<div class="group-conditions clearfix"></div>');
             block.append('<span class="conditions-move"></span>');
-            block.append('<input type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
-            block.append('<span class="field_name label label-info">' + fieldObj.label + ' <a href="" class="remove-condition">&#10006;</a></span>');
+            var field_label = fieldObj.label;
+            if (!is_blank(fieldObj.group)) {
+                field_label = Object.values(fieldObj.group)[0] + ' : ' + field_label;
+            }
+            block.append('<input type="hidden" class="field form-control" value="'+fieldObj.field+'" data-type="' + fieldObj.type + '" />');
+            block.append('<span class="field_name label label-info">' + field_label + ' <a href="" class="remove-condition">&#10006;</a></span>');
             block.append('<select class="operators hide form-control"></select>');
             block.append('<input class="fixed_operator hide form-control disabled" disabled />');
             block.append('<select class="values hide form-control"></select>');
@@ -73,12 +77,13 @@
         plugin.clear_rows = function () {
             if (confirm('Essa ação removerá todos os itens. Deseja continuar?') == true) {
                 $element.find('.group-conditions').remove();
+                plugin.getResult();
             }
         };
 
         plugin.load_operators = function (fieldEl) {
             var $fieldElement = $(fieldEl);
-            var field_name = $fieldElement.val();
+            var field_name = getFieldValue($fieldElement);
             var field = getFieldByName(field_name);
             var $groupConditions = $fieldElement.closest('.group-conditions');
             var $operators = $groupConditions.find('.operators');
@@ -199,21 +204,20 @@
             }
         };
 
-        var groupLabel = function (obj) {
-            if (obj.group !== undefined) {
-                var label = (typeof obj.group === 'object') ? obj.group[Object.keys(obj.group)[0]] : obj.group;
-                return String(label);
-            } else {
-                return '';
-            }
-        }; //END groupLabel
-
         var getFieldElement = function (groupConditions) {
-            return $(groupConditions).find('.field:input');
+            return $(groupConditions).find('.field:input:first');
         }; //END getFieldElement
 
-        var getFieldValue = function (groupConditions) {
-            return getFieldElement(groupConditions).val();
+        var getFieldValue = function(element) {
+            var value;
+            var $el = $(element);
+            if ($el.hasClass('field')) {
+                value = $el.val();
+            } else {
+                var el = getFieldElement(element);
+                value = !is_blank(el) ? getFieldValue(el) : '';
+            }
+            return value;
         }; //END getFieldValue
 
         var getOperatorElement = function (groupConditions) {
@@ -284,7 +288,7 @@
 
         var event_load_values = function (ev) {
             var $groupConditions = $(this).closest('.group-conditions');
-            var field_name = $groupConditions.find('.field').val();
+            var field_name = getFieldValue($groupConditions);
             var field = getFieldByName(field_name);
             var op_el = $(this).hasClass('operators') ? $(this).find('option:selected') : $(this);
             var values = field.values;
@@ -306,7 +310,7 @@
 
         var build_rows = function () {
             $element.find('.conditions').html('');
-            if (plugin.parameters.values.length > 0) {
+            if (!is_blank(plugin.parameters.values) && plugin.parameters.values.length > 0) {
                 $.each(plugin.parameters.values, function (i, data) {
                     var field = data[0];
                     var groupConditions = plugin.add_condition(field);
@@ -397,7 +401,7 @@
             var $fieldEl = getFieldElement($groupConditions);
             var $valueEl = getValueElement($groupConditions);
             var uTypeField = $fieldEl.attr('data-type'); //.toUpperCase();
-            var field = $fieldEl.val();
+            var field_name = getFieldValue(groupConditions);
 
             $.each($valueEl, function (i, el) {
                 var $el = $(el);
@@ -425,7 +429,7 @@
                         $el.attr('type', 'text');
                         var decimal_places = uTypeField.match(/\(([0-9]+)\)$/);
                         if (decimal_places == undefined || decimal_places == null) {
-                            decimal_places = /Vl[A-Z]/.test(field) == true ? 2 : 4;
+                            decimal_places = /Vl[A-Z]/.test(field_name) == true ? 2 : 4;
                         } else {
                             decimal_places = decimal_places[1];
                         }
@@ -451,7 +455,7 @@
                         break;
                 }
                 if (plugin.parameters.debug == true) {
-                    console.log(field, uTypeField);
+                    console.log(field_name, uTypeField);
                     $el.parent().append('<i class="type_field" style="font-size: 10px; color: #ccc;"><br>' + uTypeField + '</i>');
                 }
                 if (($el.hasClass('values') && !$el.hasClass('hide'))) {

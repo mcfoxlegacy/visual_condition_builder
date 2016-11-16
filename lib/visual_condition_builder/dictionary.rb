@@ -11,19 +11,34 @@ module VisualConditionBuilder
       end
 
       def fields(dictionary_name=:default)
-        self.dictionaries[dictionary_name].map{|d| d.slice(:field, :label, :type)}
+        dictionary ||= {}
+        self.dictionaries[dictionary_name].group_by{|h| h[:group]}.each do |group, attrs|
+          dictionary[group] ||= {} if group.present?
+          attrs.each do |attr|
+            if group.present?
+              dictionary[group][attr[:field]] = attr.slice(:label, :type)
+            else
+              dictionary[attr[:field]] = attr.slice(:label, :type)
+            end
+          end
+        end
+        dictionary
       end
 
       def param(attr, *args)
         #DEFAULT VALUES
         args = array_hashes_to_hash(args)
-        args[:field] ||= attr
         args[:type] ||= 'STRING'
         args[:operators] ||= operators_by_type(args[:type])
         args[:values] ||= []
-        args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s, scope: [:condition_dictionaries, dictionary_name])
+        args[:group] ||= ''
         if args[:group].present? && args[:group].is_a?(Symbol)
-          args[:group] = {args[:group] => I18n.t(args[:group], default: args[:group].to_s, scope: [:condition_dictionaries, dictionary_name, :groups])}
+          args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s, scope: [:condition_dictionaries, args[:group]])
+          args[:field] ||= "#{args[:group]}_#{attr}"
+          args[:group] = {args[:group] => I18n.t(args[:group], default: args[:group].to_s, scope: [:condition_builder, :dictionaries])}
+        else
+          args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s, scope: [:condition_dictionaries, dictionary_name])
+          args[:field] ||= attr
         end
         if args[:values].present? && args[:values].is_a?(Proc)
           args[:values] = args[:values].call

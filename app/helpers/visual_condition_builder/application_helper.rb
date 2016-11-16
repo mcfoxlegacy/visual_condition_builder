@@ -38,15 +38,25 @@ txtjs
             concat(content_tag(:span, nil, class:'caret'))
           end)
           concat(content_tag(:ul, class: 'dropdown-menu add-condition-menu') do
-            ObrigacaoDictionary.fields(get_dictionary_context(dictionary)).each do |attrs|
-              concat(content_tag(:li, link_to(attrs[:label], '#', class: 'add-condition-field', data: {field: attrs[:field]})))
-            end
+            create_conditions_fields_item(ObrigacaoDictionary.fields(get_dictionary_context(dictionary)))
           end)
         end
       end
     end
 
     private
+    def create_conditions_fields_item(fields)
+      fields.each do |field, attrs|
+        if field.is_a?(Hash) #GROUP
+          group_label = field.values.first
+          concat(content_tag(:li, group_label, class: 'dropdown-header'))
+          create_conditions_fields_item(attrs)
+        else
+          concat(content_tag(:li, link_to(attrs[:label], '#', class: 'add-condition-field', data: {field: field})))
+        end
+      end
+    end
+
     def get_dictionary_context(dictionary)
       dictionary.is_a?(Hash) ? dictionary.values.first : :default
     end
