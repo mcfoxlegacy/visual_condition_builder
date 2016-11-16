@@ -57,11 +57,10 @@
     /*width: 300px;*/
 }
 
-
-/* */
 .condition-builder .conditions-move {
     position: relative;
     padding-left: 1.25em;
+    cursor: row-resize;
 }
 .condition-builder .conditions-move:before {
     content: "";
@@ -76,8 +75,6 @@
             0 0.5em 0 0 black;
 }
 
-
-/* */
 .condition-builder .delete {
     position: absolute;
     right: 32px;
