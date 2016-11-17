@@ -29,7 +29,7 @@ module VisualConditionBuilder
         #DEFAULT VALUES
         args = array_hashes_to_hash(args)
         args[:type] ||= 'STRING'
-        args[:operators] ||= operators_by_type(args[:type])
+        args[:operators] = operators_by_type(args[:type]) unless args[:operators].present?
         args[:operators] = normalize_operators(args[:operators])
         args[:values] ||= []
         args[:group] ||= ''
@@ -66,7 +66,7 @@ module VisualConditionBuilder
 
       def normalize_operators(operators)
         operators.map do |operator|
-          operator = operator_default(operator) if operator.is_a?(String)
+          operator = operator_default(operator) unless operator.is_a?(Hash)
           operator[:no_value] ||= false
           operator[:multiple] ||= false
           operator[:label] ||= operator_translate(operator[:operator])
@@ -124,12 +124,16 @@ module VisualConditionBuilder
             null: {no_value: true, multiple: false},
             not_null: {no_value: true, multiple: false},
         }
-        op.present? ? (operators[op] || {}) : operators
+        if op.present?
+          (operators[operator_name(op)] || {})
+        else
+          operators
+        end
       end
 
       def operator_default(op)
         op_default = operators_list(op)
-        operator = {operator: op}
+        operator = {operator: operator_name(op)}
         operator.deep_merge!(op_default) if op_default.present?
         operator
       end
@@ -145,6 +149,10 @@ module VisualConditionBuilder
       def array_hashes_to_hash(array=nil)
         array ||= []
         array.reduce Hash.new, :merge
+      end
+
+      def operator_name(op)
+        op.to_s.downcase.to_sym
       end
     end
 

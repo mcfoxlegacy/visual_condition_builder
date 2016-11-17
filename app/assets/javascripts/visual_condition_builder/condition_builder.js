@@ -50,14 +50,14 @@
             block.append('<input type="hidden" class="field form-control" value="'+fieldObj.field+'" data-type="' + fieldObj.type + '" />');
             block.append('<span class="field_name label label-info">' + field_label + ' <a href="" class="remove-condition">&#10006;</a></span>');
             block.append('<select class="operators hide form-control"></select>');
-            block.append('<input class="fixed_operator hide form-control disabled" disabled />');
+            block.append('<span class="fixed_operator hide form-control"></span>');
             block.append('<select class="values hide form-control"></select>');
             block.append('<input class="fixed_value hide form-control" />');
             if (plugin.parameters.debug == true) {
                 block.append('<p class="expression help-block"></p>');
             }
             $elField = block.find('.field');
-            $elOperators = block.find('.operators, .fixed_operator');
+            $elOperators = block.find('.operators');
             $elValues = block.find('.values, .fixed_value');
 
             //EVENTS
@@ -99,17 +99,16 @@
             $fixedValue.val('').addClass('hide');
 
             operators = normalize_operators(operators);
-            if (operators != undefined && operators.length > 1) {
-                $.each(operators, function (op_i, op_el) {
-                    var op_option = $('<option data-index="' + op_i + '" data-no-value="' + op_el.no_value + '" data-multiple="' + op_el.multiple + '" value="' + op_el.operator + '">' + getLabel(op_el) + '</option>');
-                    $operators.append(op_option);
-                });
+            $.each(operators, function (op_i, op_el) {
+                var op_option = $('<option data-index="' + op_i + '" data-no-value="' + op_el.no_value + '" data-multiple="' + op_el.multiple + '" value="' + op_el.operator + '">' + getLabel(op_el) + '</option>');
+                $operators.append(op_option);
+            });
+            if (operators != undefined && operators.length == 1) {
+                $fixedOperator.html(getLabel(operators[0])).removeClass('hide');
+            } else {
                 $operators.removeClass('hide');
-                $operators.trigger('change');
-            } else if (operators != undefined && operators.length == 1) {
-                $fixedOperator.attr('data-index', 0).attr('data-multiple', operators[0].multiple).attr('data-no-value', operators[0].no_value);
-                $fixedOperator.val(operators[0].operator).removeClass('hide').trigger('change');
             }
+            $operators.trigger('change');
         };
 
         plugin.fill_condition = function (groupConditions, data) {
@@ -147,9 +146,11 @@
             if (typeof values == 'string') {
                 plugin.parameters.values = getJson(values);
             } else if (is_blank(values) && !is_blank(plugin.parameters.input)) {
-                if ($(plugin.parameters.input).length > 0) {
-                    plugin.parameters.values = JSON.parse($(plugin.parameters.input).val());
+                $elInput = $(plugin.parameters.input);
+                if ($elInput.length > 0) {
+                    plugin.parameters.values = JSON.parse($elInput.val());
                 }
+                console.log(plugin.parameters.values);
             } else {
                 plugin.parameters.values = values;
             }
@@ -221,11 +222,7 @@
         }; //END getFieldValue
 
         var getOperatorElement = function (groupConditions) {
-            var element = $(groupConditions).find('.operators');
-            if (element.hasClass('hide')) {
-                element = $(groupConditions).find('.fixed_operator');
-            }
-            return element;
+            return $(groupConditions).find('.operators:first');
         }; //END getOperatorElement
 
         var getOperator = function (groupConditions) {
@@ -233,6 +230,7 @@
             if (is_blank(operator)) {
                 operator = ''
             }
+            console.log(operator);
             return operator;
         }; //END getOperator
 

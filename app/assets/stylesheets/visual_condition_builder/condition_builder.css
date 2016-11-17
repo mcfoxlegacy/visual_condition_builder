@@ -48,18 +48,19 @@
     padding: 7px 7px 8px 7px;
 }
 
-.condition-builder .operators,
-.condition-builder .fixed_operator {
+.condition-builder .operators {
     width: 150px;
     text-align: center;
 }
 
 .condition-builder .fixed_operator {
     font-weight: bold;
-    border: 1px solid transparent;
     box-shadow: none;
     background-color: transparent;
-    padding: 0px 5px;
+    padding: 7px 7px 8px 7px;
+    vertical-align: middle;
+    width: auto;
+    display: inline-block;
 }
 
 .condition-builder .values,

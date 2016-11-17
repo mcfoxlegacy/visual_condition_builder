@@ -3,14 +3,9 @@ module VisualConditionBuilder
 
     def build_conditions(dictionary, *args)
       dictionary_name = get_dictionary_name(dictionary)
-
-      base_name = "#{dictionary_name}_condition".camelize(:lower)
-      object_name = "#{base_name}Builder"
       container_name = "#{dictionary_name}_condition_container"
 
       hArgs = (args ||= []).reduce(Hash.new, :merge)
-      hArgs[:jsFnCallback] = "#{base_name}Callback" unless hArgs[:jsFnCallback].present?
-
       hArgs = normalize_placeholder_label(hArgs)
 
       builder_options = {
