@@ -424,7 +424,6 @@
                     case /^DATETIME$/.test(uTypeField):
                         $el.attr('type', 'datetime');
                         break;
-                    case /^NUMBER/.test(uTypeField):
                     case /^DECIMAL/.test(uTypeField):
                         $el.attr('type', 'text');
                         var decimal_places = uTypeField.match(/\(([0-9]+)\)$/);
@@ -558,7 +557,7 @@
             }
 
             if (tags == true) {
-                $.extend(select2Config, {tags: true, tokenSeparators: [',', ';', ' ']});
+                $.extend(select2Config, {tags: true, tokenSeparators: [',', ';']});
             }
 
             $.fn.select2.defaults.set("theme", (select2Config.theme || 'bootstrap'));

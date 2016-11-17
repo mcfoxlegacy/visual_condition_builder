@@ -30,14 +30,15 @@ module VisualConditionBuilder
         args = array_hashes_to_hash(args)
         args[:type] ||= 'STRING'
         args[:operators] ||= operators_by_type(args[:type])
+        args[:operators] = normalize_operators(args[:operators])
         args[:values] ||= []
         args[:group] ||= ''
         if args[:group].present? && args[:group].is_a?(Symbol)
-          args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s, scope: [:condition_dictionaries, args[:group]])
+          args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s.humanize, scope: [:condition_dictionaries, args[:group]])
           args[:field] ||= "#{args[:group]}_#{attr}"
           args[:group] = {args[:group] => I18n.t(args[:group], default: args[:group].to_s, scope: [:condition_builder, :dictionaries])}
         else
-          args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s, scope: [:condition_dictionaries, dictionary_name])
+          args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s.humanize, scope: [:condition_dictionaries, dictionary_name])
           args[:field] ||= attr
         end
         if args[:values].present? && args[:values].is_a?(Proc)
@@ -49,30 +50,38 @@ module VisualConditionBuilder
       def operators_by_type(type)
         type = type.present? ? type.to_s.downcase.to_sym : 'string'
         operators = case type
-                      when :date
-                        [:eq]
+                      when :date, :datetime
+                        [:eq, :between, :today, :yesterday, :this_week, :last_week, :present, :blank]
                       when :time
-                        [:eq]
-                      when :datetime
-                        [:eq]
-                      when :number
-                        [:eq]
-                      when :decimal
-                        [:eq]
-                      when :integer
-                        [:eq]
+                        [:eq, :between, :present, :blank]
+                      when :decimal, :integer
+                        [:eq, :between]
                       when :string
-                        [:eq, :not_eq]
+                        [:cont, :eq, :start, :end, :present, :blank]
                       else
-                        []
+                        [:eq]
                     end
-        operators.map{|o| operators_list(o)}
-      # rescue
-      #   [{operator: '='}]
+        operators.map{|op| operator_default(op) }
+      end
+
+      def normalize_operators(operators)
+        operators.map do |operator|
+          operator = operator_default(operator) if operator.is_a?(String)
+          operator[:no_value] ||= false
+          operator[:multiple] ||= false
+          operator[:label] ||= operator_translate(operator[:operator])
+          operator
+        end
       end
 
       def operators_list(op=nil)
         operators = {
+            between: {multiple: 2},
+            today: {no_value: true},
+            yesterday: {no_value: true},
+            this_week: {no_value: true},
+            last_wee: {no_value: true},
+
             eq: {multiple: false},
             not_eq: {multiple: false},
 
@@ -115,21 +124,18 @@ module VisualConditionBuilder
             null: {no_value: true, multiple: false},
             not_null: {no_value: true, multiple: false},
         }
-        if op.present?
-          attrs = operators[op]
-          attrs[:operator] = op.to_s
-          attrs[:label] = operator_translate(op)
-          attrs
-        else
-          operators.each do |op, attrs|
-            operators[op][:operator] = op.to_s
-            operators[op][:label] = operator_translate(op)
-          end
-        end
+        op.present? ? (operators[op] || {}) : operators
+      end
+
+      def operator_default(op)
+        op_default = operators_list(op)
+        operator = {operator: op}
+        operator.deep_merge!(op_default) if op_default.present?
+        operator
       end
 
       def operator_translate(op)
-        I18n.t(op, default: op, scope: [:condition_builder, :operators])
+        I18n.t(op, default: op.to_s.humanize, scope: [:condition_builder, :operators])
       end
 
       def dictionary_name
