@@ -3,6 +3,12 @@ module VisualConditionBuilder
     class_attribute :dictionaries
 
     class << self
+      def method_missing(m, *args, &block)
+        if m =~ /_url|_path/
+          Rails.application.routes.url_helpers.send(m, args)
+        end
+      end
+
       def dictionary(name=:default, &block)
         (self.dictionaries ||= {})[name] ||= []
         @dictionary_name = name

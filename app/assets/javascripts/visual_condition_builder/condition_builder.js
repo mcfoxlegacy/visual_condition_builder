@@ -1,6 +1,6 @@
 (function ($) {
 
-    $.conditionBuilder = function(element, options) {
+    $.conditionBuilder = function (element, options) {
         var defaults = {
             placeholder: {
                 operators: 'Select a operator...',
@@ -29,7 +29,8 @@
         var $element = $(element), element = element;
         var jsonCache = {};
         plugin.parameters = {};
-        plugin.result = function(data){};
+        plugin.result = function (data) {
+        };
 
         $element.addClass('condition-builder');
 
@@ -47,7 +48,7 @@
             if (!is_blank(fieldObj.group)) {
                 field_label = Object.values(fieldObj.group)[0] + ' : ' + field_label;
             }
-            block.append('<input type="hidden" class="field form-control" value="'+fieldObj.field+'" data-type="' + fieldObj.type + '" />');
+            block.append('<input type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
             block.append('<span class="field_name label label-info">' + field_label + ' <a href="" class="remove-condition">&#10006;</a></span>');
             block.append('<select class="operators hide form-control"></select>');
             block.append('<span class="fixed_operator hide form-control"></span>');
@@ -209,7 +210,7 @@
             return $(groupConditions).find('.field:input:first');
         }; //END getFieldElement
 
-        var getFieldValue = function(element) {
+        var getFieldValue = function (element) {
             var value;
             var $el = $(element);
             if ($el.hasClass('field')) {
@@ -230,7 +231,6 @@
             if (is_blank(operator)) {
                 operator = ''
             }
-            console.log(operator);
             return operator;
         }; //END getOperator
 
@@ -527,7 +527,7 @@
                         delay: 250,
                         data: function (params) {
                             return {
-                                q: params.term, // search term
+                                key: params.term, // search term
                                 page: params.page
                             };
                         },
@@ -542,7 +542,24 @@
                             };
                         },
                         cache: true
-                    }
+                    },
+                    initSelection: function (element, callback) {
+                        var initVal = $(element).val();
+                        if (initVal !== "") {
+                            $.ajax(ajax_url, {
+                                dataType: 'json',
+                                data: {init: initVal}
+                            }).done(function (data) {
+                                var row = $.isArray(data) ? data[0] : data;
+                                if (!is_blank(row.id) && !is_blank(row.label)) {
+                                    callback({id: row.id, text: row.label});
+                                } else {
+                                    callback({id: initVal, text: initVal});
+                                }
+                            });
+                        }
+                    },
+                    minimumInputLength: 1
                 });
             }
 
@@ -564,7 +581,7 @@
             select2El.val(select2DefaultValue).trigger("change"); //FORCE RESET DO SET PLACEHOLDER
         };
 
-        plugin.init = function() {
+        plugin.init = function () {
             plugin.parameters = $.extend(true, defaults, options);
 
             //~~~ INIT
@@ -587,7 +604,7 @@
             Sortable.create(element, {
                 handle: '.conditions-move',
                 animation: 150,
-                onSort: function (evt){
+                onSort: function (evt) {
                     plugin.getResult();
                 }
             });
@@ -597,7 +614,7 @@
     };
 
     $.fn.conditionBuilder = function (options) {
-        return this.each(function() {
+        return this.each(function () {
             if (undefined == $(this).data('conditionBuilder')) {
                 var plugin = new $.conditionBuilder(this, options);
                 $(this).data('conditionBuilder', plugin);
