@@ -21,7 +21,8 @@
                 placeholder: '',
                 allowClear: false,
                 dropdownAutoWidth: 'true',
-                tags: false
+                tags: false,
+                language: "en"
             }
         };
 

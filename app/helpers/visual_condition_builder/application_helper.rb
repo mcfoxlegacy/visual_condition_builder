@@ -23,7 +23,7 @@ txtjs
       end
     end
 
-    def conditions_fields(dictionary, *args)
+    def conditions_fields(dictionary)
       dictionary_name = get_dictionary_name(dictionary)
       container_name = "#{dictionary_name}_condition_container"
       capture do
