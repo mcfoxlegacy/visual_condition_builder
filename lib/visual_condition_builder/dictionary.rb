@@ -57,7 +57,7 @@ module VisualConditionBuilder
         type = type.present? ? type.to_s.downcase.to_sym : 'string'
         operators = case type
                       when :date, :datetime
-                        [:eq, :between, :today, :yesterday, :this_week, :last_week, :present, :blank]
+                        [:eq, :between, :today, :yesterday, :tomorrow, :this_week, :last_week, :next_week, :present, :blank]
                       when :time
                         [:eq, :between, :present, :blank]
                       when :decimal, :integer
@@ -85,8 +85,10 @@ module VisualConditionBuilder
             between: {multiple: 2},
             today: {no_value: true},
             yesterday: {no_value: true},
+            tomorrow: {no_value: true},
             this_week: {no_value: true},
-            last_wee: {no_value: true},
+            last_week: {no_value: true},
+            next_week: {no_value: true},
 
             eq: {multiple: false},
             not_eq: {multiple: false},
