@@ -13,6 +13,7 @@ gem 'visual_condition_builder'
 Run the following command to install it:
 ```sh
 $ bundle install
+$ rails generate visual_condition_builder:install
 ```
 
 Add it to your **app/assets/stylesheets/application.css**
@@ -335,6 +336,61 @@ Condition Builder have converters of values to use in controller:
   @records = @q.result.paginate(page: params[:page], per_page: 10)
 ```
 
+## i18N
+
+When you create the conditions with `build_conditions` and `conditions_fields` the builder automacaly translate attributes for you.
+See default example: 
+
+```yml
+pt-BR:
+  condition_builder:
+    dropdown: 'Filtros'
+    operators:
+      between: 'Entre ... e ...'
+      today: 'Hoje'
+      yesterday: 'Ontem'
+      tomorrow: 'Amanhã'
+      this_week: 'Essa Semana'
+      last_week: 'Semana Passada'
+      next_week: 'Próxima Semana'
+      eq: 'Igual'
+      not_eq: 'Diferente'
+      matches: 'Parecido'
+      does_not_match: 'Não é Parecido'
+      lt: 'Menor'
+      gt: 'Maior'
+      lteq: 'Menor ou Igual'
+      gteq: 'Maior ou Igual'
+      in: 'Possui todos'
+      not_in: 'Não possui todos'
+      cont: 'Contém'
+      not_cont: 'Não Contém'
+      cont_any: 'Contém algum'
+      not_cont_any: 'Não Contém algum'
+      cont_all: 'Contém todos'
+      not_cont_all: 'Não contém todos'
+      start: 'Começa com'
+      not_start: 'Não começa com'
+      end: 'Termina com'
+      not_end: 'Não termina com'
+      true: 'Verdadeiro'
+      not_true: 'Não Verdadeiro'
+      false: 'Falso'
+      not_false: 'Não Falso'
+      present: 'Presente'
+      blank: 'Não Presente'
+      null: 'Nulo'
+      not_null: 'Não Nulo'
+    placeholder:
+      operators: 'Selecione um operador'
+      values: 'Selecione um valor'
+    dictionaries:
+      exemplo: 'Meu Dicionário de Exemplo'
+  condition_dictionaries:
+    exemplo:
+      nome: 'Nome'
+      idade: 'Idade'
+```
 
 ## Bug reports
 
