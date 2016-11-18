@@ -339,7 +339,7 @@ Condition Builder have converters of values to use in controller:
 ## i18N
 
 When you create the conditions with `build_conditions` and `conditions_fields` the builder automacaly translate attributes for you.
-See default example: 
+See locale file example `config/locales/visual_condition_builder.pt-BR.yml`: 
 
 ```yml
 pt-BR:
