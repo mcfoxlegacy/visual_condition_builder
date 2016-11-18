@@ -1,5 +1,4 @@
 # Search Builder 
-[![Code Climate](https://codeclimate.com/github/brunoporto/visual_condition_builder/badges/gpa.svg)](https://codeclimate.com/github/brunoporto/visual_condition_builder)
 
 A great and easy search builder to your rails project
 
