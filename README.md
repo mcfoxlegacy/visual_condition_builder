@@ -1,6 +1,6 @@
-# Search Builder 
+# Visual Condition Builder 
 
-A great and easy search builder to your rails project
+A great and easy condition builder to your rails project
 
 ## How to install
 
@@ -27,12 +27,15 @@ Add it to your **app/assets/javascripts/application.js**
 
 ## Dependency
 
-Antes de iniciar o plugin você precisa ter o jQuery adicionado no seu application.js
+To work properly, the builder needs your project to have:
 
-Caso você tenha os seguintes plugins jQuery indicados no seu application.js, você deve remover:
+- jQuery
+
+The builder already has some plugins that can conflict with your current plugins:
 
 - [select2](https://github.com/select2/select2)
 - [autoNumeric](https://github.com/BobKnothe/autoNumeric#default-settings--supported-options)
+- [Sortable](https://github.com/RubaXa/Sortable)
 
 ### Select2 Languages
 
@@ -44,15 +47,13 @@ Select2 supports multiple languages by simply including the right language JS fi
 
 ## Dictionaries
 
-As informações do gerador de condições são baseadas em um dicionário, portanto é necessário que você crie seus dicionários de acordo com o necessário.
+The condition builder information is based on a dictionary, so you need to create your dictionaries as needed.
 
-Para gerar um novo dicionário use o comando:
-
+To generate the dictionary structure run:
 ```sh
 $ rails g visual_condiction_builder:dictionary example
 ```
-
-Será criado um arquivo na pasta `app/condition_dictionaries/example_dictionary.rb` com a seguinte estrutura:
+Will be created a file `app/condition_dictionaries/example_dictionary.rb`:
 
 ```ruby
 class ExampleDictionary < VisualConditionBuilder::Dictionary
@@ -64,7 +65,7 @@ class ExampleDictionary < VisualConditionBuilder::Dictionary
 end
 ```
 
-Você pode criar multiplos contextos para esse dicionário:
+You can create multiple contexts for a dictionary, so give it a name:
 ```ruby
   dictionary :simple do
     param :name
@@ -78,8 +79,8 @@ Você pode criar multiplos contextos para esse dicionário:
 
 ### Params
 
-Você não tem restrição ao uso dos parametros, pois eles não tem ligação com model ou qualquer outro elemento da aplicação.
-Ao informar os parametros você pode passar argumentos para personalizar a forma como o gerador de condições será criado:
+You have no restrictions on the use of parameters, they have no binding with models or any element of the application.
+You can pass arguments to customize how the condition generator will be created:
 
 ```ruby
   dictionary do
@@ -90,13 +91,19 @@ Ao informar os parametros você pode passar argumentos para personalizar a forma
   end
 ```
 
-Veja abaixo todos os argumentos que você pode usar na construção dos operadores:
+See below all the arguments you can use:
 
-**TABELA DE PARAMETROS DE OPERADORES**
+Param | Description
+--- | ----
+label | Label of the field, if not informed, will search in the file.yml (ver i18n) 
+type | Type of the field. Responsible for defining how the values will be inserted (DatePicker, Numeric Mask, ...)
+operators | Defines which operators you want to use, if not informed, the default operators will be used
+values | Sets the default values for this field, restricting the user to those values.
+group | Creates a separation in the field list by grouping the fields with this group
 
-Por padrão, o gerador de condições implementa alguns operadores e argumentos, possibilitando que você informe apenas o nome do operador `operators: [:eq, :between]` 
+By default, the condition builder implements some operators and arguments, allowing you to enter only the operator name, like: `operators: [:eq, :between]` 
 
-Lista de operadores padrões do gerador de condições
+List of default operators:
 
 Operator | Description | Default Arguments
 --- | --- | ---
@@ -136,8 +143,8 @@ blank | Opposite :present | no_value: true, multiple: false
 null | where a field is null | no_value: true, multiple: false
 not_null | Opposite :null  | no_value: true, multiple: false
 
-Caso você não informe os operadores, o gerador de condições irá selecionar os operadores baseado no tipo informado:
-*Se um tipo não for informado, será considerado STRING*
+if you dont fill the operators, the builder will use the operators by field type.
+*If a type is not informed, it will be considered STRING*
 
 Type | Default Operators
 --- | ---
@@ -147,7 +154,7 @@ DECIMAL, INTEGER | eq, between
 STRING | cont, eq, start, end, present, blank
 ... | eq
 
-Também é possível informar listas de valores ou valores pré-definidos para que o gerador de condições para carregar esses valores por padrão:
+The values parameter must be informed to the constructor so the user can make a selection between them.
 
 ```ruby
   dictionary do
@@ -158,7 +165,7 @@ Também é possível informar listas de valores ou valores pré-definidos para q
   end
 ```
 
-Em todos os exemplos acima o resultado deve sempre seguir a estrutura :
+In all the above examples the result must always follow the structure:
 
 ```ruby
 [
@@ -169,11 +176,11 @@ Em todos os exemplos acima o resultado deve sempre seguir a estrutura :
 ]
 ```
 
-Quando for utilizar uma chamada AJAX o gerador de condições fará requisições passando dois tipos de parametros: **init** ou **key**, onde:
-* init - é o parametro com o valor inicial da lista. Quando o plugin tenta carregar a lista ele deverá mostrar um valor inicial antes da busca feita pelo usuário, portanto esse valor inicial deve ser retornado através do parametro init:
-* key - é o parametro com o valor digitado pelo usuário para efetuar o retorno dos valores da lista.
+When using an AJAX call, the condition generator will make requests by passing two types of parameters: ** init ** or ** key **:
+* init - is the parameter with the initial value of the list. When the plugin tries to load the list it should show an initial value before the search made by the user, so this initial value must be returned through the parameter init
+* key - is the parameter with the value entered by the user to return the values from the list.
 
-O retorno deverá seguir a estrutua padrão de valores do dicionário e retornar em formato JSON. Exemplo de um controller que implementa essa função:
+The return must follow the standard dictionary value structure and return in JSON format. Example of a controller that implements this function:
 ```ruby
 class CitiesController < ApplicationController
   def ajax
@@ -229,7 +236,8 @@ ExampleDictionary.dictionaries
 ## Helpers
 
 #### (class) dictionary_values(param_id, param_label)
-Deve ser utilizado em objetos do tipo: Array ou ActiveRecord::Relation e usa o primeiro parametro como **id** e o segundo como **label** na construção da estrutura de valores para o dicionário
+It should be used in objects of type: **Array** or **ActiveRecord::Relation**, the first parameter is **id** and the second is **label** for the dictionary
+
 ```ruby
 dictionary do
   param :book_id, values: Book.all.dictionary_values(:code, :title)
@@ -239,7 +247,10 @@ end
 ```
 
 #### (view) conditions_fields(name_of_dictionary)
+
+Creates a field selector in a dropdown element (bootstrap).
 Cria um seletor de campos em um elemento dropdown (bootstrap).
+
 ```haml
 = conditions_fields :example
 -# with context:

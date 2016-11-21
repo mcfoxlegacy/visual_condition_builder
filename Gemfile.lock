@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    visual_condition_builder (0.1.0)
+    visual_condition_builder (0.1.1)
 
 GEM
   remote: https://rubygems.org/
