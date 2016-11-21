@@ -50,11 +50,15 @@ module VisualConditionBuilder
         if args[:values].present? && args[:values].is_a?(Proc)
           args[:values] = args[:values].call
         end
+        if normalized_name(args[:type])==:boolean && args[:label] !~ /\?$/
+          args[:label]+='?'
+        end
+
         self.dictionaries[@dictionary_name] << args
       end
 
       def operators_by_type(type)
-        type = type.present? ? type.to_s.downcase.to_sym : 'string'
+        type = type.present? ? normalized_name(type) : 'string'
         operators = case type
                       when :date, :datetime
                         [:eq, :between, :today, :yesterday, :tomorrow, :this_week, :last_week, :next_week, :present, :blank]
@@ -62,6 +66,8 @@ module VisualConditionBuilder
                         [:eq, :between, :present, :blank]
                       when :decimal, :integer
                         [:eq, :between]
+                      when :boolean
+                        [:true, :false, :present, :blank]
                       when :string
                         [:cont, :eq, :start, :end, :present, :blank]
                       else
@@ -133,7 +139,7 @@ module VisualConditionBuilder
             not_null: {no_value: true, multiple: false},
         }
         if op.present?
-          (operators[operator_name(op)] || {})
+          (operators[normalized_name(op)] || {})
         else
           operators
         end
@@ -141,7 +147,7 @@ module VisualConditionBuilder
 
       def operator_default(op)
         op_default = operators_list(op)
-        operator = {operator: operator_name(op)}
+        operator = {operator: normalized_name(op)}
         operator.deep_merge!(op_default) if op_default.present?
         operator
       end
@@ -159,7 +165,7 @@ module VisualConditionBuilder
         array.reduce Hash.new, :merge
       end
 
-      def operator_name(op)
+      def normalized_name(op)
         op.to_s.downcase.to_sym
       end
     end
