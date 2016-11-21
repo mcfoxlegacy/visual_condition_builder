@@ -42,32 +42,33 @@
                 return;
             }
 
+            var new_id = new Date().getTime();
+
             //BLOCK ELEMENTS HTML
-            var block = $('<div class="group-conditions clearfix"></div>');
+            var block = $('<div id="group_conditions_'+new_id+'" data-id="'+new_id+'" class="group-conditions clearfix"></div>');
             block.append('<span class="conditions-move"></span>');
             var field_label = fieldObj.label;
             if (!is_blank(fieldObj.group)) {
                 field_label = Object.values(fieldObj.group)[0] + ' : ' + field_label;
             }
-            block.append('<input type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
-            block.append('<span class="field_name label label-info">' + field_label + ' <a href="" class="remove-condition">&#10006;</a></span>');
-            block.append('<select class="operators hide form-control"></select>');
-            block.append('<span class="fixed_operator hide form-control"></span>');
-            block.append('<select class="values hide form-control"></select>');
-            block.append('<input class="fixed_value hide form-control" />');
+            block.append('<input id="field_'+new_id+'" data-group-id="'+new_id+'" type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
+            block.append('<span id="field_name_'+new_id+'" data-group-id="'+new_id+'" class="field_name label label-info">' + field_label + ' <a href="" id="remove_condition_'+new_id+'" data-group-id="'+new_id+'" class="remove-condition">&#10006;</a></span>');
+            block.append('<select id="operators_'+new_id+'" data-group-id="'+new_id+'" class="operators hide form-control"></select>');
+            block.append('<span id="fixed_operator_'+new_id+'" data-group-id="'+new_id+'" class="fixed_operator hide form-control"></span>');
+            block.append('<select id="values_'+new_id+'" data-group-id="'+new_id+'" class="values hide form-control"></select>');
+            block.append('<input id="fixed_value_'+new_id+'" data-group-id="'+new_id+'" class="fixed_value hide form-control" />');
             if (plugin.parameters.debug == true) {
                 block.append('<p class="expression help-block"></p>');
             }
-            $elField = block.find('.field');
-            $elOperators = block.find('.operators');
-            $elValues = block.find('.values, .fixed_value');
+            $elField = block.find('#field_'+new_id);
+            $elOperators = block.find('#operators_'+new_id);
+            $elValues = block.find('#values_'+new_id+', #fixed_value_'+new_id);
 
             //EVENTS
-            block.find('.remove-condition').on('click', event_remove_condition);
+            block.find('#remove_condition_'+new_id).on('click', event_remove_condition);
             $elOperators.on('change', event_load_values);
 
             $element.append(block);
-            $element.trigger('change');
 
             //LOAD OPERATORS
             plugin.load_operators($elField);
@@ -85,16 +86,16 @@
 
         plugin.load_operators = function (fieldEl) {
             var $fieldElement = $(fieldEl);
+            var groupConditionId = $fieldElement.attr('data-group-id');
             var field_name = getFieldValue($fieldElement);
             var field = getFieldByName(field_name);
-            var $groupConditions = $fieldElement.closest('.group-conditions');
-            var $operators = $groupConditions.find('.operators');
-            var $fixedOperator = $groupConditions.find('.fixed_operator');
-            var $values = $groupConditions.find('.values');
-            var $fixedValue = $groupConditions.find('.fixed_value');
+            var $operators = $('#operators_'+groupConditionId);
+            var $fixedOperator = $('#fixed_operator_'+groupConditionId);
+            var $values = $('.values_'+groupConditionId);
+            var $fixedValue = $('.fixed_value_'+groupConditionId);
             var operators = field.operators;
 
-            remove_plugins_elements($groupConditions);
+            remove_plugins_elements(groupConditionId);
             $operators.html('').addClass('hide');
             $fixedOperator.val('').addClass('hide');
             $values.html('').addClass('hide');
@@ -113,8 +114,9 @@
             $operators.trigger('change');
         };
 
-        plugin.fill_condition = function (groupConditions, data) {
-            if (data != undefined && data.length > 0 && groupConditions != undefined) {
+        plugin.fill_condition = function (groupConditionId, data) {
+            if (data != undefined && data.length > 0 && groupConditionId != undefined) {
+                var groupConditions = getGroupConditionById(groupConditionId)
                 $elOperators = getOperatorElement(groupConditions);
                 $elOperators.val(data[1]).trigger('change');
 
@@ -136,6 +138,7 @@
                             }
                         });
                         $elValues.val(values).trigger('change');
+                        triggerEl = false;
                     }
                 } else {
                     $elValues.val(data[2]);
@@ -152,7 +155,6 @@
                 if ($elInput.length > 0) {
                     plugin.parameters.values = JSON.parse($elInput.val());
                 }
-                console.log(plugin.parameters.values);
             } else {
                 plugin.parameters.values = values;
             }
@@ -187,6 +189,10 @@
         }; //END getResult;
 
         //~~~ PRIVATE
+        var getGroupConditionById = function (groupConditionId) {
+            return $('#group_conditions_'+groupConditionId);
+        }; //END getFieldElement
+
         var getFieldByName = function (field_name) {
             var f = $.map(plugin.parameters.dictionary, function (h, i) {
                 if (h.field == field_name) {
@@ -286,12 +292,14 @@
         }; //END event_remove_condition
 
         var event_load_values = function (ev) {
-            var $groupConditions = $(this).closest('.group-conditions');
+            var $target = $(ev.target);
+            var groupConditionId = $target.attr('data-group-id');
+            var $groupConditions = getGroupConditionById(groupConditionId);
             var field_name = getFieldValue($groupConditions);
             var field = getFieldByName(field_name);
-            var op_el = $(this).hasClass('operators') ? $(this).find('option:selected') : $(this);
+            var op_el = $target.hasClass('operators') ? $target.find('option:selected') : $target;
             var values = field.values;
-            build_values(op_el, values);
+            build_values(op_el, values, groupConditionId);
         }; //END event_load_values
 
         var event_build_expression = function (ev) {
@@ -313,13 +321,14 @@
                 $.each(plugin.parameters.values, function (i, data) {
                     var field = data[0];
                     var groupConditions = plugin.add_condition(field);
-                    plugin.fill_condition(groupConditions, data);
+                    var groupConditionId = groupConditions.attr('data-id');
+                    plugin.fill_condition(groupConditionId, data);
                 });
             }
         };
 
-        var build_values = function (op_el, values) {
-            var $groupConditions = $(op_el).closest('.group-conditions');
+        var build_values = function (op_el, values, groupConditionId) {
+            var $groupConditions = getGroupConditionById(groupConditionId);
             var no_value = op_el.attr('data-no-value');
             var $values = $groupConditions.find('.values');
             var $fixedValue = $groupConditions.find('.fixed_value');
@@ -364,19 +373,21 @@
                 }
             }
 
-            validate_multiple_values($groupConditions);
-            normalize_values_type($groupConditions, list_with_item, multiple);
+            validate_multiple_values(groupConditionId);
+            normalize_values_type(groupConditionId, list_with_item, multiple);
         }; //END build_values
 
-        var validate_multiple_values = function (groupConditions) {
-            var $groupConditions = $(groupConditions);
+        var validate_multiple_values = function(groupConditionId) {
+            var $groupConditions = getGroupConditionById(groupConditionId);
             var $operatorEl = getOperatorElement($groupConditions);
             var $valueEl = getValueElement($groupConditions);
             if ($operatorEl.hasClass('operators')) {
                 $operatorEl = $operatorEl.find('option:selected');
             }
             var multiple = $operatorEl.attr('data-multiple');
-            remove_plugins_elements(groupConditions);
+
+            remove_plugins_elements(groupConditionId);
+
             if (!isNaN(multiple)) {
                 for (var i = 1; i < parseInt(multiple); i++) {
                     var $valueElClone = $valueEl.clone();
@@ -389,18 +400,18 @@
             $valueEl.attr('multiple', multiple == 'true');
         }; //END validate_multiple_values
 
-        var remove_plugins_elements = function (groupConditions) {
-            $groupConditions = $(groupConditions);
+        var remove_plugins_elements = function (groupConditionId) {
+            $groupConditions = getGroupConditionById(groupConditionId);
             $groupConditions.find('.fixed_value[class*="select2-"], .values[class*="select2-"]').select2('destroy');
             $groupConditions.find('.values.clone, .fixed_value.clone').remove();
         }; //END remove_plugins_elements
 
-        var normalize_values_type = function (groupConditions, list_with_item, multiple) {
-            var $groupConditions = $(groupConditions);
+        var normalize_values_type = function (groupConditionId, list_with_item, multiple) {
+            var $groupConditions = getGroupConditionById(groupConditionId);
             var $fieldEl = getFieldElement($groupConditions);
             var $valueEl = getValueElement($groupConditions);
             var uTypeField = $fieldEl.attr('data-type'); //.toUpperCase();
-            var field_name = getFieldValue(groupConditions);
+            var field_name = getFieldValue($groupConditions);
 
             $.each($valueEl, function (i, el) {
                 var $el = $(el);
@@ -506,7 +517,6 @@
                         if (cb != undefined && typeof cb == 'function') {
                             cb(dates)
                         }
-                        ;
                     }, errorr: function (errorr) {
                         alert("Could not load url " + url);
                     }
@@ -518,9 +528,10 @@
         var build_select2_element = function (el, tags) {
             if (tags == undefined) tags = true;
             var $el = $(el);
-            var select2Config = plugin.parameters.select2Config;
+            var select2Config = $.extend({},plugin.parameters.select2Config);
             var ajax_url = $el.attr('data-ajax-values');
-            if (ajax_url != undefined) {
+
+            if (ajax_url !== undefined) {
                 $.extend(select2Config, {
                     ajax: {
                         url: ajax_url,
@@ -552,7 +563,7 @@
                                 data: {init: initVal}
                             }).done(function (data) {
                                 var row = $.isArray(data) ? data[0] : data;
-                                if (!is_blank(row.id) && !is_blank(row.label)) {
+                                if (row!==undefined && row.id!==undefined && row.label!==undefined) {
                                     callback({id: row.id, text: row.label});
                                 } else {
                                     callback({id: initVal, text: initVal});
@@ -567,13 +578,11 @@
             var totalItems = $el.find('option').length;
             if ($el.hasClass('operators')) {
                 $.extend(select2Config, {placeholder: plugin.parameters.placeholder.operators});
-            }
-            if ($el.hasClass('values')) {
+            } else if ($el.hasClass('values')) {
                 $.extend(select2Config, {placeholder: plugin.parameters.placeholder.values});
             }
-
             if (tags == true) {
-                $.extend(select2Config, {tags: true, tokenSeparators: [',', ';']});
+                $.extend(select2Config, {tags: true, tokenSeparators: [',',';']});
             }
 
             $.fn.select2.defaults.set("theme", (select2Config.theme || 'bootstrap'));

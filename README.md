@@ -160,8 +160,8 @@ The values parameter must be informed to the constructor so the user can make a 
   dictionary do
     param :status, values: [{id: 1, label: 'Active', id: 2, label: 'Inactive'}]
     param :status_list, values: MyStatus.all.dictionary_values(:code, :title)
-    param :status_proc, values: -> { MyService.get_status }
-    param :status_ajax, values: ajax_my_status_path
+    param :status_proc, values: -> { current_user.get_status }
+    param :status_ajax, values: -> { ajax_my_status_path }
   end
 ```
 
@@ -199,6 +199,7 @@ end
 Dictionary Class have public methods to get informations about self:
 * fields(dictionary_context_name)
 * dictionary(dictionary_context_name)
+* .new(rails_context).dictionary(dictionary_context_name)
 * dictionaries
 
 ```ruby
@@ -212,6 +213,10 @@ class ExampleDictionary < VisualConditionBuilder::Dictionary
   dictionary :complex do
     param :name
     param :age
+  end
+  
+  dictionary :with_app_request do
+    param :cities, values: -> { ajax_cities_path }
   end
 
 end
@@ -230,7 +235,13 @@ ExampleDictionary.dictionary(:complex)
 # =>  [{:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Name", :field=>:name}, {:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Age", :field=>:age}] 
 
 ExampleDictionary.dictionaries
-# =>  {:default=>[{:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Name", :field=>:name}], :padrao=>[{:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Name", :field=>:name}, {:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Age", :field=>:age}]} 
+# =>  {:default=>[{:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Name", :field=>:name}], :padrao=>[{:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Name", :field=>:name}, {:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Age", :field=>:age}]}
+
+ExampleDictionary.dictionary(:with_app_request)
+# => [{:values=>#<Proc:0x00000008ddffb0@/path_to_project/app/condition_dictionaries/example_dictionary.rb:12 (lambda)>, :type=>"STRING", ...
+
+ExampleDictionary.new(rails_app_request).dictionary(:with_app_context)
+# =>  [{:values=>"/municipios/ajax", :type=>"STRING", ...
 ```
 
 ## Helpers

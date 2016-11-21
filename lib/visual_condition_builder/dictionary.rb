@@ -9,11 +9,15 @@ module VisualConditionBuilder
         end
       end
 
-      def dictionary(name=:default, &block)
+      def dictionary(name=:default, request=nil, &block)
         (self.dictionaries ||= {})[name] ||= []
         @dictionary_name = name
         block.call if block_given?
-        self.dictionaries[name]
+        if request.present?
+          ApplicationDictionary.new(request).send(:dictionary, self.name, name)
+        else
+          self.dictionaries[name]
+        end
       end
 
       def fields(dictionary_name=:default)
@@ -46,9 +50,6 @@ module VisualConditionBuilder
         else
           args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s.humanize, scope: [:condition_dictionaries, dictionary_name])
           args[:field] ||= attr
-        end
-        if args[:values].present? && args[:values].is_a?(Proc)
-          args[:values] = args[:values].call
         end
         if normalized_name(args[:type])==:boolean && args[:label] !~ /\?$/
           args[:label]+='?'

@@ -9,7 +9,7 @@ module VisualConditionBuilder
       hArgs = normalize_placeholder_label(hArgs)
 
       builder_options = {
-          dictionary: ObrigacaoDictionary.dictionary
+          dictionary: ObrigacaoDictionary.dictionary(get_dictionary_context(dictionary), self.request)
       }.deep_merge(hArgs)
 
       capture do
