@@ -199,7 +199,7 @@ end
 Dictionary Class have public methods to get informations about self:
 * fields(dictionary_context_name)
 * dictionary(dictionary_context_name)
-* .new(rails_context).dictionary(dictionary_context_name)
+* dictionary(dictionary_context_name, rails_request)
 * dictionaries
 
 ```ruby
@@ -215,7 +215,7 @@ class ExampleDictionary < VisualConditionBuilder::Dictionary
     param :age
   end
   
-  dictionary :with_app_request do
+  dictionary :app_request do
     param :cities, values: -> { ajax_cities_path }
   end
 
@@ -237,11 +237,11 @@ ExampleDictionary.dictionary(:complex)
 ExampleDictionary.dictionaries
 # =>  {:default=>[{:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Name", :field=>:name}], :padrao=>[{:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Name", :field=>:name}, {:type=>"STRING", :operators=>[{:operator=>:cont, :multiple=>false, :no_value=>false, :label=>"Contém"}, {:operator=>:eq, :multiple=>false, :no_value=>false, :label=>"Igual"}, {:operator=>:start, :multiple=>false, :no_value=>false, :label=>"Começa com"}, {:operator=>:end, :multiple=>false, :no_value=>false, :label=>"Termina com"}, {:operator=>:present, :no_value=>true, :multiple=>false, :label=>"Presente"}, {:operator=>:blank, :no_value=>true, :multiple=>false, :label=>"Não Presente"}], :values=>[], :group=>"", :label=>"Age", :field=>:age}]}
 
-ExampleDictionary.dictionary(:with_app_request)
+ExampleDictionary.dictionary(:app_request)
 # => [{:values=>#<Proc:0x00000008ddffb0@/path_to_project/app/condition_dictionaries/example_dictionary.rb:12 (lambda)>, :type=>"STRING", ...
 
-ExampleDictionary.new(rails_app_request).dictionary(:with_app_context)
-# =>  [{:values=>"/municipios/ajax", :type=>"STRING", ...
+ExampleDictionary.dictionary(:app_request, rails_app_request)
+# =>  [{:values=>"/cities/ajax", :type=>"STRING", ...
 ```
 
 ## Helpers
@@ -277,7 +277,7 @@ Mas você pode fazer a geração da lista de campos manualmente através do mét
 
 #### (view) build_conditions(name_of_dictionary, *arguments)
 
-Cria o gerador de condições na sua view:
+How create condition builder in you view: 
 ```haml
 = form_tag obrigacoes_path, method: :get do
     -# condition builder don't create input field with values, create it:
@@ -287,6 +287,7 @@ Cria o gerador de condições na sua view:
     -# Conditions Element
     = build_conditions :example, input: '#my_conditions', select2Config: {allowClear: true}
 ```
+
 Por padrão será gerado um elemento com o id no padrão dictionary_name + context_name + condition_container: `example_default_condition_container`
 
 Para criar baseado em um dicionário de contexto específico use:
