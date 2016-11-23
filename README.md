@@ -51,7 +51,7 @@ The condition builder information is based on a dictionary, so you need to creat
 
 To generate the dictionary structure run:
 ```sh
-$ rails g visual_condiction_builder:dictionary example
+$ rails g visual_condition_builder:dictionary example
 ```
 Will be created a file `app/condition_dictionaries/example_dictionary.rb`:
 
@@ -279,7 +279,7 @@ Mas você pode fazer a geração da lista de campos manualmente através do mét
 
 How create condition builder in you view: 
 ```haml
-= form_tag obrigacoes_path, method: :get do
+= form_tag my_controller_path, method: :get do
     -# condition builder don't create input field with values, create it:
     = hidden_field_tag('my_conditions', @example_conditions.to_json)
     -# DropDown with fields

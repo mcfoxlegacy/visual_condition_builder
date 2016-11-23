@@ -3,13 +3,14 @@ module VisualConditionBuilder
 
     def build_conditions(dictionary, *args)
       dictionary_name = get_dictionary_name(dictionary)
+      dictionary_klass = get_dictionary_klass(dictionary)
       container_name = "#{dictionary_name}_condition_container"
 
       hArgs = (args ||= []).reduce(Hash.new, :merge)
       hArgs = normalize_placeholder_label(hArgs)
 
       builder_options = {
-          dictionary: ObrigacaoDictionary.dictionary(get_dictionary_context(dictionary), self.request)
+          dictionary: dictionary_klass.dictionary(get_dictionary_context(dictionary), self.request)
       }.deep_merge(hArgs)
 
       capture do
@@ -25,6 +26,7 @@ txtjs
 
     def conditions_fields(dictionary)
       dictionary_name = get_dictionary_name(dictionary)
+      dictionary_klass = get_dictionary_klass(dictionary)
       container_name = "#{dictionary_name}_condition_container"
       capture do
         content_tag(:div, class: 'dropdown add-condition', data: {target: "##{container_name}"}) do
@@ -33,7 +35,7 @@ txtjs
             concat(content_tag(:span, nil, class:'caret'))
           end)
           concat(content_tag(:ul, class: 'dropdown-menu add-condition-menu') do
-            create_conditions_fields_item(ObrigacaoDictionary.fields(get_dictionary_context(dictionary)))
+            create_conditions_fields_item(dictionary_klass.fields(get_dictionary_context(dictionary)))
           end)
         end
       end
@@ -57,6 +59,9 @@ txtjs
     end
     def get_dictionary_name(dictionary)
       "#{dictionary.is_a?(Hash) ? dictionary.keys.first : dictionary}_#{get_dictionary_context(dictionary)}"
+    end
+    def get_dictionary_klass(dictionary)
+      "#{dictionary.is_a?(Hash) ? dictionary.keys.first : dictionary}_dictionary".classify.constantize
     end
 
     def normalize_placeholder_label(args)
