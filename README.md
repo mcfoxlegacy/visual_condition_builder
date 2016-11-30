@@ -2,6 +2,10 @@
 
 A great and easy condition builder to your rails project
 
+**BOOTSTRAP 3** : Version 0. ~ 1.
+
+**BOOTSTRAP 4** : Version 2. +
+
 ## How to install
 
 Add it to your **Gemfile**: 

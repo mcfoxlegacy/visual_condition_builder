@@ -52,11 +52,11 @@
                 field_label = Object.values(fieldObj.group)[0] + ' : ' + field_label;
             }
             block.append('<input id="field_'+new_id+'" data-group-id="'+new_id+'" type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
-            block.append('<span id="field_name_'+new_id+'" data-group-id="'+new_id+'" class="field_name label label-info">' + field_label + ' <a href="" id="remove_condition_'+new_id+'" data-group-id="'+new_id+'" class="remove-condition">&#10006;</a></span>');
-            block.append('<select id="operators_'+new_id+'" data-group-id="'+new_id+'" class="operators hide form-control"></select>');
-            block.append('<span id="fixed_operator_'+new_id+'" data-group-id="'+new_id+'" class="fixed_operator hide form-control"></span>');
-            block.append('<select id="values_'+new_id+'" data-group-id="'+new_id+'" class="values hide form-control"></select>');
-            block.append('<input id="fixed_value_'+new_id+'" data-group-id="'+new_id+'" class="fixed_value hide form-control" />');
+            block.append('<span id="field_name_'+new_id+'" data-group-id="'+new_id+'" class="field_name tag tag-info">' + field_label + ' <a href="" id="remove_condition_'+new_id+'" data-group-id="'+new_id+'" class="remove-condition">&#10006;</a></span>');
+            block.append('<select id="operators_'+new_id+'" data-group-id="'+new_id+'" class="operators form-control" style="display: none"></select>');
+            block.append('<span id="fixed_operator_'+new_id+'" data-group-id="'+new_id+'" class="fixed_operator form-control" style="display: none"></span>');
+            block.append('<select id="values_'+new_id+'" data-group-id="'+new_id+'" class="values form-control" style="display: none"></select>');
+            block.append('<input id="fixed_value_'+new_id+'" data-group-id="'+new_id+'" class="fixed_value form-control" style="display: none" />');
             if (plugin.parameters.debug == true) {
                 block.append('<p class="expression help-block"></p>');
             }
@@ -96,10 +96,10 @@
             var operators = field.operators;
 
             remove_plugins_elements(groupConditionId);
-            $operators.html('').addClass('hide');
-            $fixedOperator.val('').addClass('hide');
-            $values.html('').addClass('hide');
-            $fixedValue.val('').addClass('hide');
+            $operators.html('').hide();
+            $fixedOperator.val('').hide();
+            $values.html('').hide();
+            $fixedValue.val('').hide();
 
             operators = normalize_operators(operators);
             $.each(operators, function (op_i, op_el) {
@@ -107,9 +107,9 @@
                 $operators.append(op_option);
             });
             if (operators != undefined && operators.length == 1) {
-                $fixedOperator.html(getLabel(operators[0])).removeClass('hide');
+                $fixedOperator.html(getLabel(operators[0])).show();
             } else {
-                $operators.removeClass('hide');
+                $operators.show();
             }
             $operators.trigger('change');
         };
@@ -243,7 +243,7 @@
 
         var getValueElement = function (groupConditions) {
             var element = $(groupConditions).find('.values');
-            if (element.hasClass('hide')) {
+            if (element.is(":hidden")) {
                 element = $(groupConditions).find('.fixed_value');
             }
             return element;
@@ -321,8 +321,10 @@
                 $.each(plugin.parameters.values, function (i, data) {
                     var field = data[0];
                     var groupConditions = plugin.add_condition(field);
-                    var groupConditionId = groupConditions.attr('data-id');
-                    plugin.fill_condition(groupConditionId, data);
+                    if (!is_blank(groupConditions)) {
+                        var groupConditionId = groupConditions.attr('data-id');
+                        plugin.fill_condition(groupConditionId, data);
+                    }
                 });
             }
         };
@@ -334,8 +336,8 @@
             var $fixedValue = $groupConditions.find('.fixed_value');
             var multiple = op_el.attr('data-multiple');
             multiple = (multiple == 'true' ? 'true' : 'false');
-            $values.html('').removeAttr('data-ajax-values').addClass('hide');
-            $fixedValue.removeAttr('data-ajax-values').addClass('hide');
+            $values.html('').removeAttr('data-ajax-values').hide();
+            $fixedValue.removeAttr('data-ajax-values').hide();
 
             if (typeof values === 'string') {
                 $values.attr('data-ajax-values', values);
@@ -360,14 +362,14 @@
                         }
                         $values.append('<option data-index="' + val_i + '" value="' + _id + '">' + _label + '</option>');
                     });
-                    $values.removeClass('hide');
+                    $values.show();
                     $values.trigger('change');
                 } else {
                     if (multiple == 'true') {
-                        $values.removeClass('hide');
+                        $values.show();
                         $values.trigger('change');
                     } else {
-                        $fixedValue.removeClass('hide');
+                        $fixedValue.show();
                         $fixedValue.trigger('change');
                     }
                 }
@@ -391,7 +393,7 @@
             if (!isNaN(multiple)) {
                 for (var i = 1; i < parseInt(multiple); i++) {
                     var $valueElClone = $valueEl.clone();
-                    $valueElClone.addClass('clone').removeClass('hide');
+                    $valueElClone.addClass('clone').show();
                     $valueElClone.insertAfter($valueEl);
                 }
             } else {
@@ -467,7 +469,7 @@
                     console.log(field_name, uTypeField);
                     $el.parent().append('<i class="type_field" style="font-size: 10px; color: #ccc;"><br>' + uTypeField + '</i>');
                 }
-                if (($el.hasClass('values') && !$el.hasClass('hide'))) {
+                if (($el.hasClass('values') && $el.is(":visible"))) {
                     // build_select2_element($el, (!list_with_item && multiple == 'true'));
                     build_select2_element($el);
                 }

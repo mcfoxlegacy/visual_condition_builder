@@ -34,7 +34,7 @@ txtjs
             concat(I18n.t(:dropdown, default: ['Fields'], scope: [:condition_builder]))
             concat(content_tag(:span, nil, class:'caret'))
           end)
-          concat(content_tag(:ul, class: 'dropdown-menu add-condition-menu') do
+          concat(content_tag(:div, class: 'dropdown-menu add-condition-menu') do
             create_conditions_fields_item(dictionary_klass.fields(get_dictionary_context(dictionary)))
           end)
         end
@@ -46,10 +46,10 @@ txtjs
       fields.each do |field, attrs|
         if field.is_a?(Hash) #GROUP
           group_label = field.values.first
-          concat(content_tag(:li, group_label, class: 'dropdown-header'))
+          concat(content_tag(:h6, group_label, class: 'dropdown-header'))
           create_conditions_fields_item(attrs)
         else
-          concat(content_tag(:li, link_to(attrs[:label], '#', class: 'add-condition-field', data: {field: field})))
+          concat(link_to(attrs[:label], 'javascript:void(0)', class: 'dropdown-item add-condition-field', data: {field: field}))
         end
       end
     end
