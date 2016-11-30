@@ -49,7 +49,7 @@ txtjs
           concat(content_tag(:li, group_label, class: 'dropdown-header'))
           create_conditions_fields_item(attrs)
         else
-          concat(content_tag(:li, link_to(attrs[:label], '#', class: 'add-condition-field', data: {field: field}), class: 'dropdown-item'))
+          concat(content_tag(:li, link_to(attrs[:label], '#', class: 'add-condition-field', data: {field: field})))
         end
       end
     end
