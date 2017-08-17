@@ -1,4 +1,4 @@
-# require 'haml'
+require 'haml'
 require 'visual_condition_builder/engine'
 require 'visual_condition_builder/helper'
 require 'visual_condition_builder/converter'

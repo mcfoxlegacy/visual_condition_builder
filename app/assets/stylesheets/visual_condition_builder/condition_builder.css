@@ -17,6 +17,10 @@
     vertical-align: middle;
 }
 
+.condition-builder .hide {
+    display: none !important;
+}
+
 .add-condition {
     display: inline-block;
 }
@@ -25,6 +29,16 @@
     height: auto;
     max-height: 200px;
     overflow-x: hidden;
+}
+
+.add-condition-menu > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
 }
 
 .condition-builder .remove-condition {
