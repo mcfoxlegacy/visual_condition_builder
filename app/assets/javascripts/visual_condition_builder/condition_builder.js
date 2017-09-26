@@ -148,11 +148,11 @@
         }; //END fill_condition
 
         plugin.load_values = function (values) {
-            if (typeof values == 'string') {
+            if (typeof values == 'string' && !is_blank(values)) {
                 plugin.parameters.values = getJson(values);
             } else if (is_blank(values) && !is_blank(plugin.parameters.input)) {
                 $elInput = $(plugin.parameters.input);
-                if ($elInput.length > 0) {
+                if ($elInput.length > 0 && !is_blank($elInput.val())) {
                     plugin.parameters.values = JSON.parse($elInput.val());
                 }
             } else {

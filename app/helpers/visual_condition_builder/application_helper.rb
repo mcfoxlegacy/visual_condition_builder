@@ -13,15 +13,7 @@ module VisualConditionBuilder
           dictionary: dictionary_klass.dictionary(get_dictionary_context(dictionary), self.request)
       }.deep_merge(hArgs)
 
-      capture do
-        concat(content_tag(:div, nil, id: container_name))
-        concat(javascript_tag(<<txtjs
-            $(document).ready(function () {
-              $('##{container_name}').conditionBuilder(#{builder_options.to_json});
-            });
-txtjs
-        ))
-      end
+      render partial: 'visual_condition_builder/builder_conditions', locals: {container_name: container_name, builder_options: builder_options.to_json.html_safe}
     end
 
     def conditions_fields(dictionary)
@@ -33,18 +25,6 @@ txtjs
     end
 
     private
-    def create_conditions_fields_item(fields)
-      fields.each do |field, attrs|
-        if field.is_a?(Hash) #GROUP
-          group_label = field.values.first
-          concat(content_tag(:li, group_label, class: 'dropdown-header'))
-          create_conditions_fields_item(attrs)
-        else
-          concat(content_tag(:li, link_to(attrs[:label], '#', class: 'add-condition-field', data: {field: field})))
-        end
-      end
-    end
-
     def get_dictionary_context(dictionary)
       dictionary.is_a?(Hash) ? dictionary.values.first : :default
     end
