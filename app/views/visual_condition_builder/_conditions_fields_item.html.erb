@@ -1,0 +1,12 @@
+<% fields.each do |field, attrs| %>
+    <% if field.is_a?(Hash) #GROUP %>
+        <li class="dropdown-header dropdown-menu-item">
+          <%= field.values.first %>
+        </li>
+        <%= render partial: 'visual_condition_builder/conditions_fields_item', locals: {fields: attrs} %>
+    <% else %>
+        <li class="dropdown-menu-item" data-search-term="<%= attrs[:label] %>">
+          <a href="#" class="add-condition-field" data-field="<%= field%>"><%= attrs[:label] %></a>
+        </li>
+    <% end %>
+<% end %>

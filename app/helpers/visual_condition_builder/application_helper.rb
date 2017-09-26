@@ -27,18 +27,9 @@ txtjs
     def conditions_fields(dictionary)
       dictionary_name = get_dictionary_name(dictionary)
       dictionary_klass = get_dictionary_klass(dictionary)
-      container_name = "#{dictionary_name}_condition_container"
-      capture do
-        content_tag(:div, class: 'dropdown add-condition', data: {target: "##{container_name}"}) do
-          concat(content_tag(:button, class: 'btn btn-default dropdown-toggle', data: {toggle: 'dropdown'}, type: 'button') do
-            concat(I18n.t(:dropdown, default: ['Fields'], scope: [:condition_builder]))
-            concat(content_tag(:span, nil, class:'caret'))
-          end)
-          concat(content_tag(:ul, class: 'dropdown-menu add-condition-menu') do
-            create_conditions_fields_item(dictionary_klass.fields(get_dictionary_context(dictionary)))
-          end)
-        end
-      end
+      @container_name = "##{dictionary_name}_condition_container"
+      @fields = dictionary_klass.fields(get_dictionary_context(dictionary))
+      render partial: 'visual_condition_builder/conditions_fields'
     end
 
     private

@@ -164,7 +164,11 @@
         plugin.load_values_from_input = function (element_input) {
             var $elInput = $(element_input);
             if ($elInput.length > 0) {
-                plugin.parameters.values = JSON.parse($elInput.val());
+                try {
+                    plugin.parameters.values = JSON.parse($elInput.val());
+                } catch(e) {
+                    plugin.parameters.values = '';
+                }
             }
             plugin.load_values(plugin.parameters.values);
         }; //END load_values_from_input
@@ -639,5 +643,28 @@ $(document).on('click', '.add-condition-field', function (ev) {
     var container = $(this).closest('.add-condition').attr('data-target');
     var field_name = $(this).attr('data-field');
     var $conditionBuilder = $(container).data('conditionBuilder');
+    console.log('a');
     $conditionBuilder.add_condition(field_name);
+});
+
+//DROPDOWN WITH SEARCH
+$(document).on('keyup','.dropdown-filter-control', function(ev){
+    var ulEl = $(this).closest('ul.dropdown-menu');
+    var searchTerm = $(this).val().toLowerCase();
+    ulEl.find('li.dropdown-menu-item').each(function(){
+        var filter = $(this).filter(function() {
+            return $(this).attr('data-search-term').toLowerCase().indexOf(searchTerm) > -1;
+        });
+        // $(this).filter('[data-search-term *= ' + searchTerm + ']')
+        if (searchTerm.length < 1 || filter.length > 0) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+});
+
+//AUTO FOCUS
+$(document).on('shown.bs.dropdown', '.dropdown.add-condition', function () {
+    $(this).find('input.dropdown-filter-control:first').focus();
 });

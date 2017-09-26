@@ -1,0 +1,13 @@
+<div class="dropdown add-condition" data-target="<%= @container_name %>">
+  <button class="btn btn-default dropdown-toggle" data-toggle="dropdown", data-type="button">
+    <%= I18n.t(:dropdown, default: ['Fields'], scope: [:condition_builder]) %>
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-scrollable add-condition-menu">
+    <li class="dropdown-filter">
+      <input type="text" class="form-control dropdown-filter-control" autocomplete="off" role="textbox" aria-label="Search">
+    </li>
+    <li role="separator" class="divider"></li>
+    <%= render partial: 'visual_condition_builder/conditions_fields_item', locals: {fields: @fields} %>
+  </ul>
+</div>
