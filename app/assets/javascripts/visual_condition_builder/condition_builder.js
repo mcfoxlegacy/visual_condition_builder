@@ -10,6 +10,7 @@
             values: [],
             input: '',
             debug: false,
+            show: false,
             numericConfig: {
                 aSep: '',
                 aDec: '.',
@@ -51,6 +52,7 @@
             if (!is_blank(fieldObj.group)) {
                 field_label = Object.values(fieldObj.group)[0] + ' : ' + field_label;
             }
+
             block.append('<input id="field_'+new_id+'" data-group-id="'+new_id+'" type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
             block.append('<span id="field_name_'+new_id+'" data-group-id="'+new_id+'" class="field_name label label-info">' + field_label + ' <a href="" id="remove_condition_'+new_id+'" data-group-id="'+new_id+'" class="remove-condition">&#10006;</a></span>');
             block.append('<select id="operators_'+new_id+'" data-group-id="'+new_id+'" class="operators hide form-control"></select>');
@@ -158,7 +160,11 @@
             } else {
                 plugin.parameters.values = values;
             }
-            build_rows();
+            if (plugin.parameters.show==true) {
+                show_rows();
+            } else {
+                build_rows();
+            }
         }; //END load_values
 
         plugin.load_values_from_input = function (element_input) {
@@ -200,6 +206,24 @@
         var getFieldByName = function (field_name) {
             var f = $.map(plugin.parameters.dictionary, function (h, i) {
                 if (h.field == field_name) {
+                    return h;
+                }
+            });
+            if (jQuery.isArray(f)) {
+                f = f[0];
+            }
+            return f;
+        }; //END getFieldByName
+
+        var getOperatorFromField = function (operator_name, field_name_or_operators) {
+            if (jQuery.isArray(field_name_or_operators)) {
+                var operators = field_name_or_operators;
+            } else {
+                var fieldObj = getFieldByName(field_name);
+                var operators = fieldObj.operators;
+            }
+            var f = $.map(operators, function (h, i) {
+                if (h.operator == operator_name) {
                     return h;
                 }
             });
@@ -318,6 +342,24 @@
             }
             plugin.getResult();
         }; //END event_build_expression
+
+        /* UNDER CONSTRUCTION */
+        var show_rows = function () {
+            $element.find('.conditions').html('');
+            if (!is_blank(plugin.parameters.values) && plugin.parameters.values.length > 0) {
+                var $listUl = $('<ul class="list-unstyled"></ul>');
+                $.each(plugin.parameters.values, function (i, data) {
+                    var fieldObj = getFieldByName(data[0]);
+                    var operatorObj = getOperatorFromField(data[1], fieldObj.operators);
+                    var $listItem =  $('<li></li>');
+                    $listItem.append('<span class="pr-2">'+getLabel(fieldObj)+'</span>');
+                    $listItem.append('<span class="pr-2">'+getLabel(operatorObj)+'</span>');
+                    $listItem.append('<span class="">'+data[2]+'</span>');
+                    $listItem.appendTo($listUl);
+                });
+                $element.append($listUl);
+            }
+        };
 
         var build_rows = function () {
             $element.find('.conditions').html('');
