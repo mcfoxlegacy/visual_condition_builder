@@ -260,15 +260,14 @@ end
 #### (view) conditions_fields(name_of_dictionary)
 
 Creates a field selector in a dropdown element (bootstrap).
-Cria um seletor de campos em um elemento dropdown (bootstrap).
-
 ```haml
 = conditions_fields :example
 -# with context:
 = conditions_fields({:dictionary_name => :context_name})
 ```
 
-Mas você pode fazer a geração da lista de campos manualmente através do método `ExampleDictionary.fields(dictionary_name)` *(example_dictionary.rb)*, nesse caso você deve ter elementos "clicáveis" com a classe `add-condition-field` e atributo `data-field: field_name`
+You can create the list item manually `ExampleDictionary.fields (dictionary_name)` *(example_dictionary.rb)*, 
+you must have 'clickable' elements with an `add-condition-field` class and `data-field: field_name` attribute
  ```haml
 %a.add-condition-field{href: '#', data: {field: 'name'}} Name
 %a.add-condition-field{href: '#', data: {field: 'age'}} Age
@@ -287,14 +286,20 @@ How create condition builder in you view:
     -# Conditions Element
     = build_conditions :example, input: '#my_conditions', select2Config: {allowClear: true}
 ```
+Default element id: dictionary_name + context_name + condition_container: `example_default_condition_container`
 
-Por padrão será gerado um elemento com o id no padrão dictionary_name + context_name + condition_container: `example_default_condition_container`
-
-Para criar baseado em um dicionário de contexto específico use:
+To create based on a specific context dictionary use:
 ```haml
 = build_conditions({:dictionary_name => :context_name}, input: '#my_conditions', select2Config: {allowClear: true})
 ```
-Os argumentos possíveis para o build_conditions são:
+
+Its possible change `conditions_fields` title:
+```haml
+= conditions_fields :example, title: 'Click here to select a field'
+```
+
+
+Possible arguments for build_conditions are:
 
 Param | Description
 --- | ---
@@ -305,7 +310,7 @@ debug | to see debugs flags. default: false
 numericConfig | When the field is decimal type then the generator will create an input with numeric mask. Default {aSep: '', aDec: '.', aSign: ''}. See [Auto Numeric Plugin](https://github.com/BobKnothe/autoNumeric#default-settings--supported-options)
 select2Config: | Select2 Configuration. Default {theme: "bootstrap", width: 'auto', placeholder: '', allowClear: false, dropdownAutoWidth: 'true', tags: false, language: "en"}, but some parameters can be overwritten by condition builder. See [Select2 Plugin](https://github.com/select2/select2)
 
-Também é possível criar o builder manualmente chamando o plugin jquery diretamente:
+You can also create the builder manually by calling the jquery plugin:
 ```javascript
 //my_dictionary_json = ExampleDictionary.dictionary(:example).to_json
 //my_initial_values = [['name','eq','My Name']]
