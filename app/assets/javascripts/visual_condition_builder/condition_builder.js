@@ -39,41 +39,45 @@
         //~~~ PUBLIC
         plugin.add_condition = function (field_name) {
             var fieldObj = getFieldByName(field_name);
-            if (typeof fieldObj !== 'object') {
-                return;
-            }
-
             var new_id = new Date().getTime();
+            var $elField, $elOperators, $elValues;
 
             //BLOCK ELEMENTS HTML
-            var block = $('<div id="group_conditions_'+new_id+'" data-id="'+new_id+'" class="group-conditions clearfix"></div>');
+            var block = $('<div id="group_conditions_' + new_id + '" data-id="' + new_id + '" class="group-conditions clearfix"></div>');
             block.append('<span class="conditions-move"></span>');
-            var field_label = fieldObj.label;
-            if (!is_blank(fieldObj.group)) {
-                field_label = Object.values(fieldObj.group)[0] + ' : ' + field_label;
-            }
 
-            block.append('<input id="field_'+new_id+'" data-group-id="'+new_id+'" type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
-            block.append('<span id="field_name_'+new_id+'" data-group-id="'+new_id+'" class="field_name label label-info">' + field_label + ' <a href="" id="remove_condition_'+new_id+'" data-group-id="'+new_id+'" class="remove-condition">&#10006;</a></span>');
-            block.append('<select id="operators_'+new_id+'" data-group-id="'+new_id+'" class="operators hide form-control"></select>');
-            block.append('<span id="fixed_operator_'+new_id+'" data-group-id="'+new_id+'" class="fixed_operator hide form-control"></span>');
-            block.append('<select id="values_'+new_id+'" data-group-id="'+new_id+'" class="values hide form-control"></select>');
-            block.append('<input id="fixed_value_'+new_id+'" data-group-id="'+new_id+'" class="fixed_value hide form-control" />');
-            if (plugin.parameters.debug == true) {
-                block.append('<p class="expression help-block"></p>');
-            }
-            $elField = block.find('#field_'+new_id);
-            $elOperators = block.find('#operators_'+new_id);
-            $elValues = block.find('#values_'+new_id+', #fixed_value_'+new_id);
+            if (typeof fieldObj !== 'object') {
+                block.append('<span id="field_name_' + new_id + '" data-group-id="' + new_id + '" class="field_name label label-danger">' + field_name + ' <a href="" id="remove_condition_' + new_id + '" data-group-id="' + new_id + '" class="remove-condition">&#10006;</a></span>');
+            } else {
+                var field_label = fieldObj.label;
+                if (!is_blank(fieldObj.group)) {
+                    field_label = Object.values(fieldObj.group)[0] + ' : ' + field_label;
+                }
 
-            //EVENTS
-            block.find('#remove_condition_'+new_id).on('click', event_remove_condition);
-            $elOperators.on('change', event_load_values);
+                block.append('<input id="field_' + new_id + '" data-group-id="' + new_id + '" type="hidden" class="field form-control" value="' + fieldObj.field + '" data-type="' + fieldObj.type + '" />');
+                block.append('<span id="field_name_' + new_id + '" data-group-id="' + new_id + '" class="field_name label label-info">' + field_label + ' <a href="" id="remove_condition_' + new_id + '" data-group-id="' + new_id + '" class="remove-condition">&#10006;</a></span>');
+                block.append('<select id="operators_' + new_id + '" data-group-id="' + new_id + '" class="operators hide form-control"></select>');
+                block.append('<span id="fixed_operator_' + new_id + '" data-group-id="' + new_id + '" class="fixed_operator hide form-control"></span>');
+                block.append('<select id="values_' + new_id + '" data-group-id="' + new_id + '" class="values hide form-control"></select>');
+                block.append('<input id="fixed_value_' + new_id + '" data-group-id="' + new_id + '" class="fixed_value hide form-control" />');
+                if (plugin.parameters.debug == true) {
+                    block.append('<p class="expression help-block"></p>');
+                }
+                $elField = block.find('#field_' + new_id);
+                $elOperators = block.find('#operators_' + new_id);
+                $elValues = block.find('#values_' + new_id + ', #fixed_value_' + new_id);
+
+                //EVENTS
+                block.find('#remove_condition_' + new_id).on('click', event_remove_condition);
+                $elOperators.on('change', event_load_values);
+            }
 
             $element.append(block);
 
             //LOAD OPERATORS
-            plugin.load_operators($elField);
+            if (typeof $elField != 'undefined') {
+                plugin.load_operators($elField);
+            }
 
             return block;
 
@@ -87,14 +91,17 @@
         };
 
         plugin.load_operators = function (fieldEl) {
+            if (typeof fieldEl == 'undefined') {
+                return;
+            }
             var $fieldElement = $(fieldEl);
             var groupConditionId = $fieldElement.attr('data-group-id');
             var field_name = getFieldValue($fieldElement);
             var field = getFieldByName(field_name);
-            var $operators = $('#operators_'+groupConditionId);
-            var $fixedOperator = $('#fixed_operator_'+groupConditionId);
-            var $values = $('.values_'+groupConditionId);
-            var $fixedValue = $('.fixed_value_'+groupConditionId);
+            var $operators = $('#operators_' + groupConditionId);
+            var $fixedOperator = $('#fixed_operator_' + groupConditionId);
+            var $values = $('.values_' + groupConditionId);
+            var $fixedValue = $('.fixed_value_' + groupConditionId);
             var operators = field.operators;
 
             remove_plugins_elements(groupConditionId);
@@ -119,13 +126,13 @@
         plugin.fill_condition = function (groupConditionId, data) {
             if (data != undefined && data.length > 0 && groupConditionId != undefined) {
                 var groupConditions = getGroupConditionById(groupConditionId)
-                $elOperators = getOperatorElement(groupConditions);
+                var $elOperators = getOperatorElement(groupConditions);
                 $elOperators.val(data[1]).trigger('change');
 
-                $elOperator = $elOperators.find('option:selected');
+                var $elOperator = $elOperators.find('option:selected');
                 var multiple = $elOperator.attr('data-multiple');
 
-                $elValues = getValueElement(groupConditions);
+                var $elValues = getValueElement(groupConditions);
                 if ($elValues.length > 1) {
                     var values = (typeof data[2] == 'string') ? [data[2]] : data[2];
                     $.each($elValues, function (i, elValue) {
@@ -140,7 +147,7 @@
                             }
                         });
                         $elValues.val(values).trigger('change');
-                        triggerEl = false;
+                        // triggerEl = false;
                     }
                 } else {
                     $elValues.val(data[2]);
@@ -153,14 +160,14 @@
             if (typeof values == 'string' && !is_blank(values)) {
                 plugin.parameters.values = getJson(values);
             } else if (is_blank(values) && !is_blank(plugin.parameters.input)) {
-                $elInput = $(plugin.parameters.input);
+                var $elInput = $(plugin.parameters.input);
                 if ($elInput.length > 0 && !is_blank($elInput.val())) {
                     plugin.parameters.values = JSON.parse($elInput.val());
                 }
             } else {
                 plugin.parameters.values = values;
             }
-            if (plugin.parameters.show==true) {
+            if (plugin.parameters.show == true) {
                 show_rows();
             } else {
                 build_rows();
@@ -172,7 +179,7 @@
             if ($elInput.length > 0) {
                 try {
                     plugin.parameters.values = JSON.parse($elInput.val());
-                } catch(e) {
+                } catch (e) {
                     plugin.parameters.values = '';
                 }
             }
@@ -200,7 +207,7 @@
 
         //~~~ PRIVATE
         var getGroupConditionById = function (groupConditionId) {
-            return $('#group_conditions_'+groupConditionId);
+            return $('#group_conditions_' + groupConditionId);
         }; //END getFieldElement
 
         var getFieldByName = function (field_name) {
@@ -246,13 +253,18 @@
         }; //END getFieldElement
 
         var getFieldValue = function (element) {
+            if (typeof element == 'undefined') {
+                return;
+            }
             var value;
             var $el = $(element);
             if ($el.hasClass('field')) {
                 value = $el.val();
             } else {
                 var el = getFieldElement(element);
-                value = !is_blank(el) ? getFieldValue(el) : '';
+                if (el.length > 0) {
+                    value = !is_blank(el) ? getFieldValue(el) : '';
+                }
             }
             return value;
         }; //END getFieldValue
@@ -351,10 +363,10 @@
                 $.each(plugin.parameters.values, function (i, data) {
                     var fieldObj = getFieldByName(data[0]);
                     var operatorObj = getOperatorFromField(data[1], fieldObj.operators);
-                    var $listItem =  $('<li></li>');
-                    $listItem.append('<span class="pr-2">'+getLabel(fieldObj)+'</span>');
-                    $listItem.append('<span class="pr-2">'+getLabel(operatorObj)+'</span>');
-                    $listItem.append('<span class="">'+data[2]+'</span>');
+                    var $listItem = $('<li></li>');
+                    $listItem.append('<span class="pr-2">' + getLabel(fieldObj) + '</span>');
+                    $listItem.append('<span class="pr-2">' + getLabel(operatorObj) + '</span>');
+                    $listItem.append('<span class="">' + data[2] + '</span>');
                     $listItem.appendTo($listUl);
                 });
                 $element.append($listUl);
@@ -367,8 +379,10 @@
                 $.each(plugin.parameters.values, function (i, data) {
                     var field = data[0];
                     var groupConditions = plugin.add_condition(field);
-                    var groupConditionId = groupConditions.attr('data-id');
-                    plugin.fill_condition(groupConditionId, data);
+                    if (typeof groupConditions != 'undefined') {
+                        var groupConditionId = groupConditions.attr('data-id');
+                        plugin.fill_condition(groupConditionId, data);
+                    }
                 });
             }
         };
@@ -423,7 +437,7 @@
             normalize_values_type(groupConditionId, list_with_item, multiple);
         }; //END build_values
 
-        var validate_multiple_values = function(groupConditionId) {
+        var validate_multiple_values = function (groupConditionId) {
             var $groupConditions = getGroupConditionById(groupConditionId);
             var $operatorEl = getOperatorElement($groupConditions);
             var $valueEl = getValueElement($groupConditions);
@@ -447,7 +461,7 @@
         }; //END validate_multiple_values
 
         var remove_plugins_elements = function (groupConditionId) {
-            $groupConditions = getGroupConditionById(groupConditionId);
+            var $groupConditions = getGroupConditionById(groupConditionId);
             $groupConditions.find('.fixed_value[class*="select2-"], .values[class*="select2-"]').select2('destroy');
             $groupConditions.find('.values.clone, .fixed_value.clone').remove();
         }; //END remove_plugins_elements
@@ -574,7 +588,7 @@
         var build_select2_element = function (el, tags) {
             if (tags == undefined) tags = true;
             var $el = $(el);
-            var select2Config = $.extend({},plugin.parameters.select2Config);
+            var select2Config = $.extend({}, plugin.parameters.select2Config);
             var ajax_url = $el.attr('data-ajax-values');
 
             if (ajax_url !== undefined) {
@@ -609,7 +623,7 @@
                                 data: {init: initVal}
                             }).done(function (data) {
                                 var row = $.isArray(data) ? data[0] : data;
-                                if (row!==undefined && row.id!==undefined && row.label!==undefined) {
+                                if (row !== undefined && row.id !== undefined && row.label !== undefined) {
                                     callback({id: row.id, text: row.label});
                                 } else {
                                     callback({id: initVal, text: initVal});
@@ -628,7 +642,7 @@
                 $.extend(select2Config, {placeholder: plugin.parameters.placeholder.values});
             }
             if (tags == true) {
-                $.extend(select2Config, {tags: true, tokenSeparators: [',',';']});
+                $.extend(select2Config, {tags: true, tokenSeparators: [',', ';']});
             }
 
             $.fn.select2.defaults.set("theme", (select2Config.theme || 'bootstrap'));
@@ -685,16 +699,15 @@ $(document).on('click', '.add-condition-field', function (ev) {
     var container = $(this).closest('.add-condition').attr('data-target');
     var field_name = $(this).attr('data-field');
     var $conditionBuilder = $(container).data('conditionBuilder');
-    console.log('a');
     $conditionBuilder.add_condition(field_name);
 });
 
 //DROPDOWN WITH SEARCH
-$(document).on('keyup','.dropdown-filter-control', function(ev){
+$(document).on('keyup', '.dropdown-filter-control', function (ev) {
     var ulEl = $(this).closest('ul.dropdown-menu');
     var searchTerm = $(this).val().toLowerCase();
-    ulEl.find('li.dropdown-menu-item').each(function(){
-        var filter = $(this).filter(function() {
+    ulEl.find('li.dropdown-menu-item').each(function () {
+        var filter = $(this).filter(function () {
             return $(this).attr('data-search-term').toLowerCase().indexOf(searchTerm) > -1;
         });
         // $(this).filter('[data-search-term *= ' + searchTerm + ']')
