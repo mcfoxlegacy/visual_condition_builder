@@ -66,16 +66,15 @@
                 $elField = block.find('#field_' + new_id);
                 $elOperators = block.find('#operators_' + new_id);
                 $elValues = block.find('#values_' + new_id + ', #fixed_value_' + new_id);
-
-                //EVENTS
-                block.find('#remove_condition_' + new_id).on('click', event_remove_condition);
-                $elOperators.on('change', event_load_values);
             }
 
+            //EVENTS
+            block.find('#remove_condition_' + new_id).on('click', event_remove_condition);
             $element.append(block);
 
             //LOAD OPERATORS
             if (typeof $elField != 'undefined') {
+                $elOperators.on('change', event_load_values);
                 plugin.load_operators($elField);
             }
 
