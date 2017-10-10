@@ -95,7 +95,7 @@ See below all the arguments you can use:
 
 Param | Description
 --- | ----
-label | Label of the field, if not informed, will search in the file.yml (ver i18n) 
+label | Label of the field, if not informed, will search in the visual_condition_builder.*.yml. (default: param name) 
 type | Type of the field. Responsible for defining how the values will be inserted (DatePicker, Numeric Mask, ...)
 operators | Defines which operators you want to use, if not informed, the default operators will be used
 values | Sets the default values for this field, restricting the user to those values.
@@ -366,7 +366,8 @@ Condition Builder have converters of values to use in controller:
 ## i18N
 
 When you create the conditions with `build_conditions` and `conditions_fields` the builder automacaly translate attributes for you.
-See locale file example `config/locales/visual_condition_builder.pt-BR.yml`: 
+See locale file example `config/locales/visual_condition_builder.pt-BR.yml`:
+Parameters with dots in the name are converted to underscores, example: "address.number" => "address_number" 
 
 ```yml
 pt-BR:
@@ -415,8 +416,9 @@ pt-BR:
       exemplo: 'Meu Dicionário de Exemplo'
   condition_dictionaries:
     exemplo:
-      nome: 'Nome'
-      idade: 'Idade'
+      name: 'Name'
+      age: 'Age'
+      address_number: "Adress Number"
 ```
 
 ## Bug reports

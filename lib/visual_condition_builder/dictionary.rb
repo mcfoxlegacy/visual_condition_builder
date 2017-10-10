@@ -38,17 +38,18 @@ module VisualConditionBuilder
       def param(attr, *args)
         #DEFAULT VALUES
         args = array_hashes_to_hash(args)
+        attr_param = attr.to_s.gsub(/\./,'_')
         args[:type] ||= 'STRING'
         args[:operators] = operators_by_type(args[:type]) unless args[:operators].present?
         args[:operators] = normalize_operators(args[:operators])
         args[:values] ||= []
         args[:group] ||= ''
         if args[:group].present? && args[:group].is_a?(Symbol)
-          args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s.humanize, scope: [:condition_dictionaries, args[:group]])
+          args[:label] ||= I18n.t(attr_param, default: attr.to_s.humanize, scope: [:condition_dictionaries, args[:group]])
           args[:field] ||= "#{args[:group]}_#{attr}"
           args[:group] = {args[:group] => I18n.t(args[:group], default: args[:group].to_s, scope: [:condition_builder, :dictionaries])}
         else
-          args[:label] ||= I18n.t(attr.to_sym, default: attr.to_s.humanize, scope: [:condition_dictionaries, dictionary_name])
+          args[:label] ||= I18n.t(attr_param, default: attr.to_s.humanize, scope: [:condition_dictionaries, dictionary_name])
           args[:field] ||= attr
         end
         if normalized_name(args[:type])==:boolean && args[:label] !~ /\?$/
