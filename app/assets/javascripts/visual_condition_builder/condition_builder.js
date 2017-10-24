@@ -194,7 +194,10 @@
                 var field_name = getFieldValue(groupConditions);
                 var operator = getOperator(groupConditions);
                 var value = getValue(groupConditions);
+
                 if (!is_blank(field_name) && !is_blank(operator) && !is_blank(value)) {
+                    data.push([field_name, operator, value]);
+                } else if (!is_blank(field_name) && operator == '') { //FIELD ONLY
                     data.push([field_name, operator, value]);
                 }
             });
