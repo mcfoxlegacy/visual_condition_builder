@@ -114,10 +114,13 @@
                 var op_option = $('<option data-index="' + op_i + '" data-no-value="' + op_el.no_value + '" data-multiple="' + op_el.multiple + '" value="' + op_el.operator + '">' + getLabel(op_el) + '</option>');
                 $operators.append(op_option);
             });
-            if (operators != undefined && operators.length == 1) {
+
+            if (operators.length > 1) {
+                $operators.removeClass('hide');
+            } else if (operators.length == 1) {
                 $fixedOperator.html(getLabel(operators[0])).removeClass('hide');
             } else {
-                $operators.removeClass('hide');
+                //NONE
             }
             $operators.trigger('change');
         };

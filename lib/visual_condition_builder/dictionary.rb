@@ -40,7 +40,7 @@ module VisualConditionBuilder
         args = array_hashes_to_hash(args)
         attr_param = attr.to_s.gsub(/\./,'_')
         args[:type] ||= 'STRING'
-        args[:operators] = operators_by_type(args[:type]) unless args[:operators].present?
+        args[:operators] = operators_by_type(args[:type]) if args.dig(:operators).nil?
         args[:operators] = normalize_operators(args[:operators])
         args[:values] ||= []
         args[:group] ||= ''

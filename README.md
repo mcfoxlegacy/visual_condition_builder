@@ -101,7 +101,8 @@ operators | Defines which operators you want to use, if not informed, the defaul
 values | Sets the default values for this field, restricting the user to those values.
 group | Creates a separation in the field list by grouping the fields with this group
 
-By default, the condition builder implements some operators and arguments, allowing you to enter only the operator name, like: `operators: [:eq, :between]` 
+By default, the condition builder implements some operators and arguments, allowing you to enter only the operator name, like: `operators: [:eq, :between]`
+You can also inform `operators: []` to hide operator's box. 
 
 List of default operators:
 

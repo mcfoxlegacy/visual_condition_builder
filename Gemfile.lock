@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    visual_condition_builder (2.1.5)
+    visual_condition_builder (2.1.6)
       rails (>= 3, < 6)
 
 GEM
@@ -33,13 +33,15 @@ GEM
       tzinfo (~> 0.3.37)
     arel (4.0.2)
     builder (3.1.4)
+    concurrent-ruby (1.0.5)
     erubis (2.7.0)
-    i18n (0.7.0)
+    i18n (0.9.0)
+      concurrent-ruby (~> 1.0)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     mime-types (2.4.3)
     minitest (4.7.5)
-    multi_json (1.11.0)
+    multi_json (1.12.2)
     rack (1.5.5)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -56,16 +58,16 @@ GEM
       activesupport (= 4.0.13)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (10.4.2)
+    rake (12.1.0)
     sprockets (3.0.1)
       rack (~> 1.0)
     sprockets-rails (2.2.4)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
-    thor (0.19.1)
-    thread_safe (0.3.5)
-    tzinfo (0.3.43)
+    thor (0.19.4)
+    thread_safe (0.3.6)
+    tzinfo (0.3.53)
 
 PLATFORMS
   ruby
