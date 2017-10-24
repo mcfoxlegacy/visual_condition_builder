@@ -197,8 +197,8 @@
 
                 if (!is_blank(field_name) && !is_blank(operator) && !is_blank(value)) {
                     data.push([field_name, operator, value]);
-                } else if (!is_blank(field_name) && operator == '') { //FIELD ONLY
-                    data.push([field_name, operator, value]);
+                } else if (!is_blank(field_name) && operator == '' && is_blank(value)) { //FIELD ONLY
+                    data.push(field_name);
                 }
             });
             if (typeof plugin.result === 'function') {
@@ -366,12 +366,19 @@
             if (!is_blank(plugin.parameters.values) && plugin.parameters.values.length > 0) {
                 var $listUl = $('<ul class="list-unstyled"></ul>');
                 $.each(plugin.parameters.values, function (i, data) {
-                    var fieldObj = getFieldByName(data[0]);
-                    var operatorObj = getOperatorFromField(data[1], fieldObj.operators);
+                    var fieldObj, operatorObj;
+                    if (typeof data == 'object') { //ONLY FIELD
+                        fieldObj = getFieldByName(data[0]);
+                        operatorObj = getOperatorFromField(data[1], fieldObj.operators);
+                    } else {
+                        fieldObj = getFieldByName(data);
+                    }
                     var $listItem = $('<li></li>');
                     $listItem.append('<span class="pr-2">' + getLabel(fieldObj) + '</span>');
-                    $listItem.append('<span class="pr-2">' + getLabel(operatorObj) + '</span>');
-                    $listItem.append('<span class="">' + data[2] + '</span>');
+                    if (!is_blank(operatorObj)) {
+                        $listItem.append('<span class="pr-2">' + getLabel(operatorObj) + '</span>');
+                        $listItem.append('<span class="">' + data[2] + '</span>');
+                    }
                     $listItem.appendTo($listUl);
                 });
                 $element.append($listUl);
@@ -382,9 +389,15 @@
             $element.find('.conditions').html('');
             if (!is_blank(plugin.parameters.values) && plugin.parameters.values.length > 0) {
                 $.each(plugin.parameters.values, function (i, data) {
-                    var field = data[0];
+                    var field, operator;
+                    if (typeof data == 'object') { //ONLY FIELD
+                        field = data[0];
+                        operator = data[1];
+                    } else {
+                        field = data;
+                    }
                     var groupConditions = plugin.add_condition(field);
-                    if (typeof groupConditions != 'undefined') {
+                    if (typeof groupConditions != 'undefined' && !is_blank(operator)) {
                         var groupConditionId = groupConditions.attr('data-id');
                         plugin.fill_condition(groupConditionId, data);
                     }
@@ -558,7 +571,7 @@
         }; //END normalize_operators
 
         var is_blank = function (value) {
-            return (value === undefined || value === null || value === [] || value === '')
+            return (typeof value == 'undefined' || value == null || value == [] || value == '')
         }; //END is_blank
 
         var flatten = function (arrays) {
