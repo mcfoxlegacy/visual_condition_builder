@@ -194,9 +194,14 @@
                 var field_name = getFieldValue(groupConditions);
                 var operator = getOperator(groupConditions);
                 var value = getValue(groupConditions);
+                var showValue = getValueElement(groupConditions).is(':visible');
 
-                if (!is_blank(field_name) && !is_blank(operator) && !is_blank(value)) {
+                console.log(field_name, operator, value, showValue);
+
+                if (!is_blank(field_name) && !is_blank(operator) && showValue && !is_blank(value)) {
                     data.push([field_name, operator, value]);
+                } else if (!is_blank(field_name) && !is_blank(operator) && !showValue) { //FIELD AND OPERATOR
+                    data.push([field_name, operator]);
                 } else if (!is_blank(field_name) && operator == '' && is_blank(value)) { //FIELD ONLY
                     data.push(field_name);
                 }
@@ -367,17 +372,22 @@
                 var $listUl = $('<ul class="list-unstyled"></ul>');
                 $.each(plugin.parameters.values, function (i, data) {
                     var fieldObj, operatorObj;
-                    if (typeof data == 'object') { //ONLY FIELD
+                    if (typeof data == 'string') { //FIELD ONLY
+                        fieldObj = getFieldByName(data);
+                    } else {
                         fieldObj = getFieldByName(data[0]);
                         operatorObj = getOperatorFromField(data[1], fieldObj.operators);
-                    } else {
-                        fieldObj = getFieldByName(data);
+                        console.log(data, operatorObj)
                     }
+
+                    //RENDER
                     var $listItem = $('<li></li>');
                     $listItem.append('<span class="pr-2">' + getLabel(fieldObj) + '</span>');
                     if (!is_blank(operatorObj)) {
                         $listItem.append('<span class="pr-2">' + getLabel(operatorObj) + '</span>');
-                        $listItem.append('<span class="">' + data[2] + '</span>');
+                        if (typeof data[2] != 'undefined') {
+                            $listItem.append('<span class="">' + data[2] + '</span>');
+                        }
                     }
                     $listItem.appendTo($listUl);
                 });
@@ -390,7 +400,7 @@
             if (!is_blank(plugin.parameters.values) && plugin.parameters.values.length > 0) {
                 $.each(plugin.parameters.values, function (i, data) {
                     var field, operator;
-                    if (typeof data == 'object') { //ONLY FIELD
+                    if (typeof data == 'object') { //FIELD ONLY
                         field = data[0];
                         operator = data[1];
                     } else {

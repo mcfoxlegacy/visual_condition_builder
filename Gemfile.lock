@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    visual_condition_builder (2.2.0)
+    visual_condition_builder (2.2.1)
       rails (>= 3, < 6)
 
 GEM
