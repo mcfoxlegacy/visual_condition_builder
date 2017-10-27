@@ -134,27 +134,29 @@
                 var $elOperator = $elOperators.find('option:selected');
                 var multiple = $elOperator.attr('data-multiple');
 
-                var $elValues = getValueElement(groupConditions);
-                if ($elValues.length > 1) {
-                    var values = (typeof data[2] == 'string') ? [data[2]] : data[2];
-                    $.each($elValues, function (i, elValue) {
-                        $(elValue).val(values[i]);
-                    });
-                } else if (multiple == 'true' || $elValues.attr('data-ajax-values') !== undefined) {
-                    var values = (typeof data[2] == 'string') ? [data[2]] : data[2];
-                    if (values != undefined) {
-                        $.each(values, function (i, value) {
-                            if ($elValues.find('option[value="' + value + '"]').length <= 0) {
-                                $elValues.append('<option value="' + value + '">' + value + '</option>');
-                            }
+                if (typeof data[2] != 'undefined') {
+                    var $elValues = getValueElement(groupConditions);
+                    if ($elValues.length > 1) {
+                        var values = (typeof data[2] == 'string') ? [data[2]] : data[2];
+                        $.each($elValues, function (i, elValue) {
+                            $(elValue).val(values[i]);
                         });
-                        $elValues.val(values).trigger('change');
-                        // triggerEl = false;
+                    } else if (multiple == 'true' || $elValues.attr('data-ajax-values') !== undefined) {
+                        var values = (typeof data[2] == 'string') ? [data[2]] : data[2];
+                        if (values != undefined) {
+                            $.each(values, function (i, value) {
+                                if ($elValues.find('option[value="' + value + '"]').length <= 0) {
+                                    $elValues.append('<option value="' + value + '">' + value + '</option>');
+                                }
+                            });
+                            $elValues.val(values).trigger('change');
+                            // triggerEl = false;
+                        }
+                    } else {
+                        $elValues.val(data[2]);
                     }
-                } else {
-                    $elValues.val(data[2]);
+                    $elValues.trigger('change');
                 }
-                $elValues.trigger('change');
             }
         }; //END fill_condition
 
@@ -195,8 +197,6 @@
                 var operator = getOperator(groupConditions);
                 var value = getValue(groupConditions);
                 var showValue = getValueElement(groupConditions).is(':visible');
-
-                console.log(field_name, operator, value, showValue);
 
                 if (!is_blank(field_name) && !is_blank(operator) && showValue && !is_blank(value)) {
                     data.push([field_name, operator, value]);
@@ -371,17 +371,14 @@
             if (!is_blank(plugin.parameters.values) && plugin.parameters.values.length > 0) {
                 var $listUl = $('<ul class="list-unstyled"></ul>');
                 $.each(plugin.parameters.values, function (i, data) {
+                    var $listItem = $('<li></li>');
                     var fieldObj, operatorObj;
-                    if (typeof data == 'string') { //FIELD ONLY
+                    if (typeof data == 'string') { //ONLY FIELD
                         fieldObj = getFieldByName(data);
                     } else {
                         fieldObj = getFieldByName(data[0]);
                         operatorObj = getOperatorFromField(data[1], fieldObj.operators);
-                        console.log(data, operatorObj)
                     }
-
-                    //RENDER
-                    var $listItem = $('<li></li>');
                     $listItem.append('<span class="pr-2">' + getLabel(fieldObj) + '</span>');
                     if (!is_blank(operatorObj)) {
                         $listItem.append('<span class="pr-2">' + getLabel(operatorObj) + '</span>');
@@ -400,7 +397,7 @@
             if (!is_blank(plugin.parameters.values) && plugin.parameters.values.length > 0) {
                 $.each(plugin.parameters.values, function (i, data) {
                     var field, operator;
-                    if (typeof data == 'object') { //FIELD ONLY
+                    if (typeof data == 'object') { //ONLY FIELD
                         field = data[0];
                         operator = data[1];
                     } else {
@@ -699,10 +696,13 @@
                 plugin.load_values(plugin.parameters.values);
             }
 
+            console.log(element);
+
             Sortable.create(element, {
                 handle: '.conditions-move',
                 animation: 150,
                 onSort: function (evt) {
+                    console.log(evt);
                     plugin.getResult();
                 }
             });
