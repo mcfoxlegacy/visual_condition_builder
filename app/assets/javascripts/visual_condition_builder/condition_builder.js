@@ -199,7 +199,7 @@
                 var value = getValue(groupConditions);
                 var showValue = getValueElement(groupConditions).is(':visible');
 
-                if (!is_blank(field_name) && !is_blank(operator) && showValue && (operatorObj.no_value || !is_blank(value))) {
+                if (!is_blank(field_name) && !is_blank(operator) && showValue && (operatorObj.no_value == true || !is_blank(value))) {
                     data.push([field_name, operator, value]);
                 } else if (!is_blank(field_name) && !is_blank(operator) && !showValue) { //FIELD AND OPERATOR
                     data.push([field_name, operator]);
