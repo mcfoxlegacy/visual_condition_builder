@@ -195,10 +195,11 @@
             $element.find('.group-conditions').each(function (i, groupConditions) {
                 var field_name = getFieldValue(groupConditions);
                 var operator = getOperator(groupConditions);
+                var operatorObj = getOperatorFromField(operator, field_name);
                 var value = getValue(groupConditions);
                 var showValue = getValueElement(groupConditions).is(':visible');
 
-                if (!is_blank(field_name) && !is_blank(operator) && showValue && !is_blank(value)) {
+                if (!is_blank(field_name) && !is_blank(operator) && showValue && (operatorObj.no_value || !is_blank(value))) {
                     data.push([field_name, operator, value]);
                 } else if (!is_blank(field_name) && !is_blank(operator) && !showValue) { //FIELD AND OPERATOR
                     data.push([field_name, operator]);
@@ -236,7 +237,7 @@
             if (jQuery.isArray(field_name_or_operators)) {
                 var operators = field_name_or_operators;
             } else {
-                var fieldObj = getFieldByName(field_name);
+                var fieldObj = getFieldByName(field_name_or_operators);
                 var operators = fieldObj.operators;
             }
             var f = $.map(operators, function (h, i) {
