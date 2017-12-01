@@ -25,7 +25,8 @@ module VisualConditionBuilder
           when :next_week
             ransack_q["#{p[0]}_gteq"] = Date.today.next_week.beginning_of_week
             ransack_q["#{p[0]}_lteq"] = Date.today.next_week.end_of_week
-          when :not_null, :null, :blank, :true, :not_true, :false, :not_false, :present
+          when :not_null, :null, :blank, :true, :not_true, :false, :not_false, :present, :not_present
+            #TODO: VALIDAR ESSES OPERADORES
             ransack_q["#{p[0]}_#{p[1]}"] = '1'
           else
             ransack_q["#{p[0]}_#{p[1]}"] = p[2]
@@ -109,15 +110,17 @@ module VisualConditionBuilder
           when :true
             tmp[p[0]] = 'true'
           when :not_true
-            tmp[p[0]] = Hash["$ne", 'true']
+            tmp[p[0]] = Hash["$ne", true]
           when :false
             tmp[p[0]] = 'false'
           when :not_false
-            tmp[p[0]] = Hash["$ne", 'false']
+            tmp[p[0]] = Hash["$ne", false]
           when :present
-            tmp[p[0]] = Hash["$ne", '']
+            tmp[p[0]] = Hash["$exists", true]
+          when :not_present
+            tmp[p[0]] = Hash["$exists", false]
           when :blank
-            tmp[p[0]] = ''
+            tmp[p[0]] = Hash["$in", ['null','']]
           when :null
             tmp[p[0]] = 'null'
           when :not_null

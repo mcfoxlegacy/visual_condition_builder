@@ -139,8 +139,9 @@ true | where a field is true | no_value: true, multiple: false
 not_true | Opposite :true  | no_value: true, multiple: false
 false | where a field is false | no_value: true, multiple: false
 not_false | Opposite :false  | no_value: true, multiple: false
-present | where a field is present (not null and not a blank string) | no_value: true, multiple: false
-blank | Opposite :present | no_value: true, multiple: false
+present | where a field is present | no_value: true, multiple: false
+not_present | where a field is not present | no_value: true, multiple: false
+blank | where a field is blank | no_value: true, multiple: false
 null | where a field is null | no_value: true, multiple: false
 not_null | Opposite :null  | no_value: true, multiple: false
 

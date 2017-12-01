@@ -63,15 +63,15 @@ module VisualConditionBuilder
         type = type.present? ? normalized_name(type) : 'string'
         operators = case type
                       when :date, :datetime
-                        [:eq, :between, :today, :yesterday, :tomorrow, :this_week, :last_week, :next_week, :present, :blank]
+                        [:eq, :between, :today, :yesterday, :tomorrow, :this_week, :last_week, :next_week, :present, :not_present, :blank]
                       when :time
-                        [:eq, :between, :present, :blank]
+                        [:eq, :between, :present, :not_present, :blank]
                       when :decimal, :integer
                         [:eq, :between]
                       when :boolean
-                        [:true, :false, :present, :blank]
+                        [:true, :false, :present, :not_present, :blank]
                       when :string
-                        [:cont, :eq, :start, :end, :present, :blank]
+                        [:cont, :not_cont, :eq, :not_eq, :start, :end, :present, :not_present, :blank]
                       else
                         [:eq]
                     end
@@ -135,6 +135,7 @@ module VisualConditionBuilder
             not_false: {no_value: true, multiple: false},
 
             present: {no_value: true, multiple: false},
+            not_present: {no_value: true, multiple: false},
             blank: {no_value: true, multiple: false},
 
             null: {no_value: true, multiple: false},
