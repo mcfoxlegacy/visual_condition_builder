@@ -2,7 +2,7 @@ module VisualConditionBuilder
   class Converter
     def self.to_ransack(params)
       ransack_q = {}
-      conditions = params.is_a?(Array) ? params : JSON.parse(params ||= '[]')
+      conditions = params.is_a?(String) ? JSON.parse(params ||= '[]') : params
       conditions.map do |p|
         case p[1].to_s.downcase.to_sym
           when :between
@@ -37,7 +37,7 @@ module VisualConditionBuilder
 
     def self.to_mongo(params)
       query = []
-      conditions = params.is_a?(Array) ? params : JSON.parse(params ||= '[]')
+      conditions = params.is_a?(String) ? JSON.parse(params ||= '[]') : params
       conditions.map do |p|
         tmp = {}
         case p[1].to_s.downcase.to_sym
